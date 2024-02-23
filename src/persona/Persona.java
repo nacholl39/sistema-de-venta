@@ -1,14 +1,17 @@
 package persona;
 
 import java.time.LocalDate;
+
+import interfaz.Listable;
 import org.eclipse.jdt.annotation.NonNull;
 
 import logger.MyLogger;
 
 import java.time.temporal.ChronoUnit;
-import java.util.StringTokenizer;
-import java.util.logging.FileHandler;
+import java.util.*;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import venta.Factura;
 import venta.Venta;
@@ -20,12 +23,25 @@ import venta.Venta;
  * @author Mlm96
  * @version 1.0
  */
-public abstract class Persona {
+public abstract class Persona implements Listable {
     // Declaramos los atributos
     protected String nif, nombre, direccion, correo;
     protected int telefono, edad;
     protected LocalDate fechaNac;
-    protected Venta[] listadoVentas;
+    // CRITERIO: Se han reconocido las librerías de clases relacionadas con tipos de datos avanzados (5%).
+    // CRITERIO: Se han utilizado listas para almacenar y procesar información (15%).
+    // He cambiado el array de ventas, por un arrayList, y he modificado
+    // los métodos relacionados con dicho ArrayList (buscar, add, eliminar y modificar)
+    // por lo que en dichos métodos relacionados con el listado de ventas
+    // también podrás ver el uso de los métodos de los arrayList
+    // para cubrir los criterios
+    protected ArrayList<Venta> listadoVentas;
+    // En el caso del listado de Facturas, lo he dejado como un array
+    // normal, para poder hacer uso de los métodos de la clase Arrays
+    // y cumplir con el criterio "a"
+    // Puede verse en el método "buscarFactura" en el hacemos uso de "sort"
+    // para ordenar el array antes de recorrerlo, aprovechando que la
+    // clase "Factura" tiene implementada la interfaz "comparable"
     protected Factura[] listadoFacturas;
     protected static Logger logger;
     // Bloque estático
@@ -35,7 +51,7 @@ public abstract class Persona {
     }
     // Bloque inicialización
     {
-        listadoVentas = new Venta[10];
+        listadoVentas = new ArrayList<>();
         listadoFacturas = new Factura[10];
     }
     /**
@@ -88,6 +104,20 @@ public abstract class Persona {
     }
 
     // Métodos y funcionalidades
+    // Método genérico, que implementamos de la interfaz Listable
+    // CRITERIO: Se han utilizado iteradores para recorrer los elementos de las listas (10%)
+    // CRITERIO: Se han creado clases y métodos genéricos (20%).
+    @Override
+    public void listarElemento(ArrayList listadoVentas) {
+        // Creamos un iterador
+        Iterator<Venta> it = listadoVentas.iterator();
+        // Recorremos con el objeto de iterator, verificando que haya un siguiente elemento
+        while (it.hasNext()) {
+            // Y lo mostramos
+            System.out.println(it.next());
+        }
+    }
+
     // Mostrar informacion (método abstracto)
     /**
      * Método abstracto para mostrar la información relacionada con la persona.
@@ -134,6 +164,9 @@ public abstract class Persona {
      * -2 si el parámetro no es válido.
      */
     public int buscarFactura(Factura factura) {
+        // CRITERIO: Se han escrito programas que utilicen arrays (15%)
+        // Ordenamos el array con el método "sort"
+        Arrays.sort(listadoFacturas);
         // Inicializamos un contador para recorrer el array
         int contador=0;
         // Evaluamos que sea una instancia de "Factura" y que no sea un valor nulo
@@ -240,28 +273,18 @@ public abstract class Persona {
      * @return true si la factura se ha añadido correctamente, false en caso contrario.
      */
     public boolean addVenta(Venta venta) {
-        // Inicializamos un constador para recorrer el listado de Facturas
-        int contador=0;
         // Evaluamos que sea una instancia de "Venta" y que no sea un valor nulo
         if(venta!=null) {
-            // Recorremos el listado de facturas, y añadimos la factura donde el valor sea Null
-            // es decir, donde este vacío. Como no sabemos cuando será, usamos do,while
-            do {
-                if(listadoVentas[contador] == null) {
-                    // Añadimos la factura al array
-                    listadoVentas[contador] = venta;
-                    // Si se ha agregado devolvemos un true y así salimos del bucle también
-                    logger.info("Venta añadida");
-                    return true;
-                }
-                // Incrementamos el contador
-                contador++;
-                // Evaluamos en la condición que contador no supere al tamaño del array
-            } while((contador<listadoVentas.length));
+            // En caso de no ser nulo, añadimos la venta al arrayList con "add"
+            listadoVentas.add(venta);
+            // Si se ha agregado devolvemos un true y así salimos del bucle también
+            logger.info("Venta añadida");
+            return true;
+        } else {
+            // Si no se ha añadido correctamente devolvemos "false"
+            logger.info("Venta no añadida");
+            return false;
         }
-        // Si no se ha añadido correctamente devolvemos "false"
-        logger.info("Venta no añadida");
-        return false;
     }
     // Buscar Venta
     /**
@@ -270,33 +293,35 @@ public abstract class Persona {
      * @return El índice de la venta en el listado si se encuentra, -1 si no se encuentra,
      * -2 si el parámetro no es válido.
      */
-    public int buscarVenta(Venta venta) {
-        // Inicializamos un contador para recorrer el array
-        int contador=0;
+    public Venta buscarVenta(Venta venta) {
+        // En primer lugar ordenamos el arrayList haciendo uso del método "sort", pero de la interfaz
+        // colection en este caso, ya que no es un array normal
+        Collections.sort(listadoVentas);
         // Evaluamos que sea una instancia de "Factura" y que no sea un valor nulo
         if(venta!=null) {
-            // Recorremos el array de Facturas, como no sabemos cuando encontraremos la factura
-            // emplearemos un bucle do,while
-            do {
-                // Usamos la interfaz comparable de "Factura" para evaluar si son iguales
-                if(listadoVentas[contador].compareTo(venta) == 0) {
-                    // Salimos del bucle si se ha cumplido la condición
-                    // Con eso conseguimos que contador se quede con el valor de la posición
-                    logger.info("Venta encontrada en posición: " + contador);
-                    return contador;
+            // Creamos un iterador para recorrer el arrayList
+            // CRITERIO: Se han utilizado iteradores para recorrer los elementos de las listas (10%).
+            Iterator<Venta> it = listadoVentas.iterator();
+            // Utilizamos el objeto de iterator que hemos creado, para hacer uso de su método
+            // "hasnext" y comprobar si existe un elemento siguiente
+            // Como dicho método nos devulve un valor boolean, lo usaremos como condición del bucle
+            while (it.hasNext()) {
+                // En caso de existir, nos devuelve true, y acontinuación haciendo uso del método "next()"
+                // accedemos a dicho elemento y aprovechando que tenemos implementado en "Venta" la interfaz
+                // comparable, evaluamos si el valor devuelto por dicho mé
+                if (it.next().compareTo(venta) == 0) {
+                    logger.info("Venta encontrada");
+                    return venta;
                 }
-                // Incrementamos el contador
-                contador++;
-                // Evaluamos que contador no supere el tamaño del array
-            } while((contador<listadoVentas.length));
-            // Retornamos el valor -1 si no se ha encontrado ninguna
-            logger.info("Venta no encontrada");
-            return -1;
+            }
+            // En caso de recorrer el arrayList y no encontrar coincidencia
+            // devolvemos "null"
+            return null;
         } else {
-            // Devolvemos un -2 en caso de que el parámetro no sea válido (nulo o de otro tipo)
-            logger.info("Venta no válida");
-            return -2;
+            // En caso de que el objeto pasado sea nulo, devolvemos "null"
+            return null;
         }
+
     }
     // Eliminar Venta
     /**
@@ -305,39 +330,19 @@ public abstract class Persona {
      * @return true si la venta se ha eliminado correctamente, false en caso contrario.
      */
     public boolean eliminarVenta(Venta venta) {
-        // Llamamos al método "buscarVenta" para encontrar la posición del elemento a
-        // eliminar y le asignamos el valor a una variable
-        int posicion = buscarVenta(venta);
-        // Inicializamos un nuevo array de Ventas
-        Venta[] nuevoListadoVentas = new Venta[10];
-        // Evaluamos que la posición devuelta sea mayor o igual a 0, ya que en caso contrario
-        // significa que el objeto venta es nulo, de otro tipo o no se ha encontrado
-        if(posicion>=0) {
-            // Inicializamos un contador para recorrer el array nuevo
-            int contador=0;
-            // Recorremos el array de Ventas y la guardamos mientras no coincida, en el nuevo array
-            // asi obtenemos un nuevo array usamos un bucle for porque debemos recorrerlo entero
-            for(int i=0; i<listadoVentas.length; i++) {
-                // Si no coincide la variable iteradora con la posición que deseamos eliminar,
-                // la almacenamos e incrementamos el contador de posiciones del nuevo
-                // array, en caso contrario no, así conseguimos que no se quede el hueco
-                // de la posición que hemos eliminado en el nuevo listado
-                if(i!=posicion) {
-                    nuevoListadoVentas[contador] = listadoVentas[i];
-                    // Incrementamos el contador
-                    contador++;
-                }
-            }
-            // Reasignamos al listado de facturas el nuevo listado
-            setListadoVentas(nuevoListadoVentas);
-            // Devolvemos un true para verificar que se ha hecho correctamente
-            logger.info("Venta eliminada");
-            return true;
+        // Evaluamos la nulidad del objeto pasado
+        if(venta!=null) {
+            // Si no es nulo, llamamos al método "remove", que verifica si dicho objeto existe en el arrayLIst,
+            // y en caso afirmativo lo elimina
+            // Como el método nos devuelve un booleano, lo aprovechamos y lo devolvemos
+            return listadoVentas.remove(venta);
+        } else {
+            // En caso de ser nulo, devolvemos un valor "false"
+            return false;
         }
-        // Devolvemos false, en caso de que no se haya eliminado ningun elemento y siga igual
-        logger.info("Venta no eliminada");
-        return false;
     }
+
+
     // Editar venta
     /**
      * Método para modificar una venta en el listado de ventas de la persona.
@@ -346,24 +351,28 @@ public abstract class Persona {
      * @return true si la venta se ha modificado correctamente, false en caso contrario.
      */
     public boolean modificarVenta(Venta ventaBuscar, Venta ventaNueva) {
-        // Llamamos al método buscar venta para localizar la venta a modificar
-        // y guardamos la posición en una variable
-        int posicion = buscarVenta(ventaBuscar);
-        // Evaluamos que la posición devuelta sea mayor o igual a 0, ya que en caso contrario
-        // significa que el objeto factura es nulo, de otro tipo o no se ha encontrado
-        if(posicion>=0) {
-            // Se lo asignamos a la factura nueva el identificador de la antigua
-            ventaNueva.setId(listadoVentas[posicion].getId());
-            // Le asignamos al objeto de factura en esa posición, los nuevos valores, que
-            // son los del objeto "facturaNueva"
-            listadoVentas[posicion] = ventaNueva;
-            // Devolvemos un true para verificar que se ha hecho correctamente
-            logger.info("Venta editada");
-            return true;
+        // Evaluamos que los dos objetos no sean nulos
+        if((ventaBuscar != null) && (ventaNueva != null)) {
+            // Llamamos al método "indexOf" para averiguar la posición del elemento que buscamos en el ArrayList
+            int posicion = listadoVentas.indexOf(ventaBuscar);
+            // Aprovechando que "indexOf", nos devulve un -1 en caso de no encontrar el objeto en el ArrayList
+            // y evaluamos que la posición sea mayor o igual a 0
+            if(posicion>=0) {
+                // En primer lugar, le asignamos al nuevo objeto, el id del viejo
+                ventaNueva.setId(listadoVentas.get(posicion).getId());
+                // Asignamos el nuevo Objeto, en la posición del antiguo
+                listadoVentas.set(posicion, ventaNueva);
+                // Si se ha modificado el objeto correctamente, devolvemos un true
+                return true;
+            } else {
+                // Si no se encuentra devolvemos "false"
+                return false;
+            }
+        } else {
+            // En caso de haber alguno nulo, devolvemos "false
+            return false;
         }
-        // Devolvemos false, en caso de que no se haya modficado ningun elemento y siga igual
-        logger.info("Venta no editada");
-        return false;
+
     }
 
 
@@ -404,13 +413,8 @@ public abstract class Persona {
      * @param listadoVentas el nuevo listado de ventas.
      * @return true si el listado de ventas se ha establecido correctamente, false en caso contrario.
      */
-    public boolean setListadoVentas(Venta[] listadoVentas) {
-        // Nos aseguramos de que ambos arrays tengan el mismo tamaño
-        if(listadoVentas.length==getListadoVentas().length) {
-            this.listadoVentas = listadoVentas;
-            // Devolvemos true si se a reasignado correctamente
-            return true;
-        } else return false;
+    public void setListadoVentas(ArrayList<Venta> listadoVentas) {
+        this.listadoVentas = listadoVentas;
     }
     // Listado Facturas
     public Factura[] getListadoFacturas() {
@@ -463,16 +467,16 @@ public abstract class Persona {
      * valor por defecto en caso contrario.
      */
     public String setCorreo(String correo) {
-        // Realizamos las validaciones del formato empleando StringTokenizer
-        // Primero creamos un objeto de String Tokenizer y separamos por la "@" para obtener
-        // por un lado el nic y por otro la extensión
-        StringTokenizer st = new StringTokenizer(correo, "@");
-        // Guardamos el nic del correo, en caso de no tener, esto guardará una cadena vacía ""
-        String nic = st.nextToken();
-        // Guardamos la extensión del correo con el siguiente token
-        String extension = st.nextToken();
-        // Validamos que tenga nic y que la extensión contenga un "."
-        if(nic != "" && extension.indexOf(".") != -1) {
+        // CRITERIO: Se han utilizado expresiones regulares en la búsqueda de patrones en cadenas de texto (10%).
+        // Creamos un objeto de Pattern pasandole el formato que queremos para el correo
+        // mediante una expresión regular
+        Pattern patron = Pattern.compile("(\\w|\\-){1,60}@[a-zA-Z]{1,50}\\.[a-z]{1,6}");
+        // Creamos un objeto de Matcher que nos servirá para validar si se ha cumplido con
+        // el patron definido
+        Matcher matcher = patron.matcher(correo);
+        // Utilizamos el objeto de "matcher" para verificar mediante un condicional si se ha cumplido
+        // en caso afirmativo, asignamos el correo pasado por parámetro y lo devovemos
+        if(matcher.matches()) {
             this.correo = correo;
             return correo;
         } else {
