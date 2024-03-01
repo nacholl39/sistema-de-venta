@@ -3,7 +3,6 @@ package persona;
 import java.time.LocalDate;
 
 import interfaz.Listable;
-import org.eclipse.jdt.annotation.NonNull;
 
 import logger.MyLogger;
 
@@ -64,7 +63,7 @@ public abstract class Persona implements Listable {
      */
     // Constructores
     // Primer constructor, pedimos lo imprescindible: nif y nombre
-    public Persona(@NonNull String nif, @NonNull String nombre, @NonNull LocalDate fechaNac) {
+    public Persona(String nif, String nombre, LocalDate fechaNac) {
         this.nif = nif;
         this.nombre = nombre;
         this.fechaNac = fechaNac;
@@ -83,7 +82,7 @@ public abstract class Persona implements Listable {
      * @param direccion Es la direccion de la persona
      * @param correo Se trata del correo de la persona
      */
-    public Persona(@NonNull String nif, @NonNull String nombre, @NonNull LocalDate fechaNac,
+    public Persona( String nif, String nombre,  LocalDate fechaNac,
                    String direccion, String correo) {
         this(nif,nombre, fechaNac);
         this.direccion = direccion;
@@ -92,12 +91,12 @@ public abstract class Persona implements Listable {
     }
     // Tercer constructor, llamamos al primer constructor y además
     // pedimos la telefono
-    public Persona(@NonNull String nif, @NonNull String nombre, int telefono, LocalDate fechaNac) {
+    public Persona( String nif, String nombre, int telefono, LocalDate fechaNac) {
         this(nif,nombre, fechaNac);
         this.telefono = telefono;
     }
     // Cuarto constructor, llamamos al segundo y además pedimos el teléfono
-    public Persona(@NonNull String nif, @NonNull String nombre, int telefono, LocalDate fechaNac,
+    public Persona( String nif, String nombre, int telefono, LocalDate fechaNac,
                    String direccion, String correo) {
         this(nif, nombre, fechaNac, direccion, correo);
         this.telefono = telefono;
@@ -403,7 +402,7 @@ public abstract class Persona implements Listable {
         return nif;
     }
     // Listado Ventas
-    public Venta[] getListadoVentas() {
+    public ArrayList<Venta> getListadoVentas() {
         return listadoVentas;
     }
     /**

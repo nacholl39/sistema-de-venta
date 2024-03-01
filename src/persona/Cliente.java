@@ -2,7 +2,6 @@ package persona;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import org.eclipse.jdt.annotation.NonNull;
 
 import venta.Factura;
 import venta.Venta;
@@ -29,17 +28,17 @@ public final class Cliente extends Persona {
     }
     // Constructores
     // Constructores
-    public Cliente(@NonNull String nif, @NonNull String nombre, @NonNull LocalDate fechaNac) {
+    public Cliente(String nif, String nombre, LocalDate fechaNac) {
         super(nif, nombre, fechaNac);
     }
-    public Cliente(@NonNull String nif, @NonNull String nombre, @NonNull LocalDate fechaNac,
+    public Cliente( String nif, String nombre, LocalDate fechaNac,
                    String direccion, String correo) {
         super(nif, nombre, fechaNac, direccion, correo);
     }
-    public Cliente(@NonNull String nif, @NonNull String nombre, int telefono, LocalDate fechaNac) {
+    public Cliente(String nif, String nombre, int telefono, LocalDate fechaNac) {
         super(nif, nombre, telefono, fechaNac);
     }
-    public Cliente(@NonNull String nif, @NonNull String nombre, int telefono, LocalDate fechaNac,
+    public Cliente( String nif, String nombre, int telefono, LocalDate fechaNac,
                    String direccion, String correo) {
         super(nif, nombre, telefono, fechaNac, direccion, correo);
     }

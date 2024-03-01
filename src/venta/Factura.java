@@ -3,7 +3,6 @@ package venta;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import org.eclipse.jdt.annotation.NonNull;
 
 import persona.Cliente;
 import persona.Vendedor;
@@ -65,8 +64,8 @@ public class Factura implements Comparable {
      * @param detallesFactura Array de objetos de la clase detalle factura
      */
     // Constructor
-    public Factura(@NonNull Cliente cliente, @NonNull Vendedor vendedor, @NonNull Venta venta,
-                   @NonNull DetalleFactura[] detallesFactura) {
+    public Factura( Cliente cliente, Vendedor vendedor, Venta venta,
+                    DetalleFactura[] detallesFactura) {
         this.cliente = cliente;
         this.vendedor = vendedor;
         this.venta = venta;

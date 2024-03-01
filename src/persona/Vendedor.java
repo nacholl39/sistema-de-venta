@@ -2,8 +2,6 @@ package persona;
 
 import java.time.LocalDate;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 import venta.Factura;
 import venta.Venta;
 
@@ -25,17 +23,17 @@ public final class Vendedor extends Persona{
         numeroVendedor = contador++;
     }
     // Constructores
-    public Vendedor(@NonNull String nif, @NonNull String nombre, @NonNull LocalDate fechaNac) {
+    public Vendedor( String nif, String nombre, LocalDate fechaNac) {
         super(nif, nombre, fechaNac);
     }
-    public Vendedor(@NonNull String nif, @NonNull String nombre, @NonNull LocalDate fechaNac,
+    public Vendedor( String nif, String nombre, LocalDate fechaNac,
                     String direccion, String correo) {
         super(nif, nombre, fechaNac, direccion, correo);
     }
-    public Vendedor(@NonNull String nif, @NonNull String nombre, int telefono, LocalDate fechaNac) {
+    public Vendedor( String nif, String nombre, int telefono, LocalDate fechaNac) {
         super(nif, nombre, telefono, fechaNac);
     }
-    public Vendedor(@NonNull String nif, @NonNull String nombre, int telefono, LocalDate fechaNac,
+    public Vendedor( String nif, String nombre, int telefono, LocalDate fechaNac,
                     String direccion, String correo) {
         super(nif, nombre, telefono, fechaNac, direccion, correo);
     }

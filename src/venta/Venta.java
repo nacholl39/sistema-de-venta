@@ -2,7 +2,6 @@ package venta;
 
 import java.time.LocalDate;
 
-import org.eclipse.jdt.annotation.NonNull;
 
 import persona.Cliente;
 import persona.Vendedor;
@@ -30,7 +29,7 @@ public class Venta implements Comparable{
         fecha = LocalDate.now();
     }
     // Constructor
-    public Venta(@NonNull Cliente cliente, @NonNull Vendedor vendedor) {
+    public Venta( Cliente cliente, Vendedor vendedor) {
         this.cliente = cliente;
         this.vendedor = vendedor;
     }

@@ -1,6 +1,5 @@
 package producto;
 
-import org.eclipse.jdt.annotation.NonNull;
 
 import venta.Factura;
 
@@ -25,8 +24,8 @@ public class AtributoCategoria implements Comparable {
         id = contador++;
     }
     // Constructor
-    public AtributoCategoria(@NonNull String atributo, @NonNull String valor,
-                             @NonNull String unidad) {
+    public AtributoCategoria( String atributo, String valor,
+                              String unidad) {
         this.atributo = atributo;
         this.valor = valor;
         this.unidad = unidad;

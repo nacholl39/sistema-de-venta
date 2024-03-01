@@ -1,6 +1,5 @@
 package producto;
 
-import org.eclipse.jdt.annotation.NonNull;
 
 import venta.DetalleFactura;
 import venta.Factura;
@@ -63,8 +62,8 @@ public class Producto implements Comparable {
      * @param categoria categoria del producto, se verifica con el método comprobarCategoria.
      * @param precio es el precio del producto.
      */
-    public Producto(@NonNull String referencia, @NonNull int marca, @NonNull int modelo,
-                    @NonNull int categoria, @NonNull float precio) {
+    public Producto( String referencia, int marca, int modelo,
+                     int categoria, float precio) {
         // Ponemos el String pasado a referencia como minúscula y le quitamos los espacios
         // que le hayan podido introducir, con esto evitamos que de la misma referencia
         // se introduzcan más de un String diferente
@@ -78,8 +77,8 @@ public class Producto implements Comparable {
         this.precio = precio;
     }
     // Segundo constructor, llamamos al primero, y además le pasamos la decripción
-    public Producto(@NonNull String referencia, @NonNull int marca, @NonNull int modelo,
-                    @NonNull int categoria, @NonNull float precio, @NonNull String descripcion) {
+    public Producto( String referencia, int marca, int modelo,
+                     int categoria, float precio, String descripcion) {
         // Llamamos al primer constructor
         this(referencia, marca, modelo, categoria, precio);
         // Asignamos la descripción
