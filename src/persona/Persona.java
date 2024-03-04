@@ -2,8 +2,6 @@ package persona;
 
 import java.time.LocalDate;
 
-import interfaz.Listable;
-
 import logger.MyLogger;
 
 import java.time.temporal.ChronoUnit;
@@ -22,7 +20,7 @@ import venta.Venta;
  * @author Mlm96
  * @version 1.0
  */
-public abstract class Persona implements Listable {
+public abstract class Persona {
     // Declaramos los atributos
     protected String nif, nombre, direccion, correo;
     protected int telefono, edad;
@@ -34,6 +32,14 @@ public abstract class Persona implements Listable {
     // por lo que en dichos métodos relacionados con el listado de ventas
     // también podrás ver el uso de los métodos de los arrayList
     // para cubrir los criterios
+    /*
+     Se ha reconocido las ventajas de los tipos de las distintas estructuras de datos
+     ya que la idea era utilizar "HashSet" en vez de "ArrayList", debido a que "HashSet"
+     no permite valores duplicados y no debe exister la posibilidad de que haya dos facturas
+     en el mismo listado.
+     Pero debido a que el criterio "c" dice que utilicemos "listas" he optado por usar ArrayList
+     para cumplir con dicho criterio.
+     */
     protected ArrayList<Venta> listadoVentas;
     // En el caso del listado de Facturas, lo he dejado como un array
     // normal, para poder hacer uso de los métodos de la clase Arrays
@@ -104,18 +110,6 @@ public abstract class Persona implements Listable {
 
     // Métodos y funcionalidades
     // Método genérico, que implementamos de la interfaz Listable
-    // CRITERIO: Se han utilizado iteradores para recorrer los elementos de las listas (10%)
-    // CRITERIO: Se han creado clases y métodos genéricos (20%).
-    @Override
-    public void listarElemento(ArrayList listadoVentas) {
-        // Creamos un iterador
-        Iterator<Venta> it = listadoVentas.iterator();
-        // Recorremos con el objeto de iterator, verificando que haya un siguiente elemento
-        while (it.hasNext()) {
-            // Y lo mostramos
-            System.out.println(it.next());
-        }
-    }
 
     // Mostrar informacion (método abstracto)
     /**
@@ -469,6 +463,26 @@ public abstract class Persona implements Listable {
         // CRITERIO: Se han utilizado expresiones regulares en la búsqueda de patrones en cadenas de texto (10%).
         // Creamos un objeto de Pattern pasandole el formato que queremos para el correo
         // mediante una expresión regular
+        /*
+         Explicación de la expresión:
+            - ( \\w|\\-){1,60}: La \\w indica que permite caracteres alfanuméricos y "_", pero como
+                algunos correos pueden incluir "-" lo incluimos como opción dentro del paréntesis
+                y usando el operador lógico or "|". En cuanto al tamaño he puesto que sea de 1 caracter
+                como mínimo, para asegurarme que tenga algun nombre delante del "@", y le he puesto un
+                límite de 60, para evitar que se introduzcan infinitos caracteres.
+            - @: En este caso este caracter lo incamos directamente y sin un tamaño, porque no existen
+                más opciones después del nombre que no sea la @ y solo debe haber una.
+            - [a-zA-Z]{1,50}: Esta parte hace referencia al dominio del correo, como solo he visto dominios
+                que contengan letras, he puesto el rango solamente de caracteres del alfabeto, tanto mayuscula
+                como minuscula. Además un tamaño entre 1 y 50.
+            - \\.: al igual que en la @, queremos indicar que en esta posición va un punto, y solo uno, pero
+                al tratarse el "." de un caracter reservado, debemos utilizar los caracteres de escape \\,
+                al igual que en la "w" y "-".
+            - [a-z]{1,6}: Por último, en esta parte que hace referencia a la extensión del correo (Por ejemplo:
+                "com","es",...) he puesto que acepte caracteres alfabéticos en minusculas, porque no he visto
+                ningún correo que utilice otro tipo de caracteres, además en este caso el tamaño que he puesto
+                también es mucho menor, de 1 a 6 caracteres.
+         */
         Pattern patron = Pattern.compile("(\\w|\\-){1,60}@[a-zA-Z]{1,50}\\.[a-z]{1,6}");
         // Creamos un objeto de Matcher que nos servirá para validar si se ha cumplido con
         // el patron definido
