@@ -11,7 +11,6 @@ import venta.Venta;
 import xml.Xml;
 
 import java.time.LocalDate;
-
 /**
  * Esta clase nos servirá para probar las diferentes clases y métodos de dichas clases de nuestro
  * proyecto, para verificar su correcto funcionamiento, o por el contrario, para detectar los
