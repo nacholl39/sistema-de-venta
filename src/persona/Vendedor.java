@@ -56,4 +56,17 @@ public final class Vendedor extends Persona{
         return numeroVendedor;
     }
 
+    @Override
+    public String toString() {
+        return "Vendedor{" +
+                "numeroVendedor=" + numeroVendedor +
+                ", nif='" + nif + '\'' +
+                ", nombre='" + nombre + '\'' +
+                ", direccion='" + direccion + '\'' +
+                ", correo='" + correo + '\'' +
+                ", telefono=" + telefono +
+                ", edad=" + edad +
+                ", fechaNac=" + fechaNac +
+                '}';
+    }
 }

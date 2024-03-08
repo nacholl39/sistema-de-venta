@@ -20,7 +20,7 @@ public class DetalleFactura implements Comparable {
     }
     // Constructor
     public DetalleFactura(int lineaFactura, int cantidad,
-                           Producto producto) {
+                          Producto producto) {
         this.lineaFactura = lineaFactura;
         this.cantidad = cantidad;
         this.producto = producto;

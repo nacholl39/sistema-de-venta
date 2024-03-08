@@ -25,11 +25,12 @@ public class Test {
         // crear un objeto de "Factura"
 
         // Primero crearemos un objeto de cliente, y para ello vamos a inicializar sus atributos
-        String nifCliente = "22233343-s", nombreCLiente = "antonio";
+        String nifCliente = "22233343-s", nombreCliente = "antonio", direccion = "Avenida Genil",
+                correo = "antonio@gmail.com"; // Le pasamos un correo para verificar que funcione la expresión regular
         LocalDate fechaNacCliente = LocalDate.of(1998, 10, 27);
-        Cliente cliente = new Cliente(nifCliente, nombreCLiente, fechaNacCliente);
+        Cliente cliente = new Cliente(nifCliente, nombreCliente, fechaNacCliente, direccion, correo);
         // A continuación haremos lo mismo para Vendedor
-        String nifVendedor = "", nombreVendedor = "";
+        String nifVendedor = "324432432-j", nombreVendedor = "federico";
         LocalDate fechaNacVendedor = LocalDate.of(1993, 11, 15);
         Vendedor vendedor = new Vendedor(nifVendedor, nombreVendedor, fechaNacVendedor);
 
@@ -58,7 +59,7 @@ public class Test {
         cantidad (5) y producto
          */
         DetalleFactura detalleFactura = new DetalleFactura(1,
-                    5, producto);
+                5, producto);
         // Inicializamos un array, aunque en este caso con un solo elemento
         // para hacer la prueba
         DetalleFactura [] listaDetallesFacturas = {detalleFactura};
@@ -69,19 +70,27 @@ public class Test {
         // ------ XML -----------
 
         // Creamos dos Documentos, uno para los clientes y otro para vendedor
-        // Primero creamos una instancia de la clase para usar los métodos
-        Xml xml = new Xml();
-
-        Document xmlCliente = xml.crearDocumento(); // Creamos un documento de CLiente
-        Document xmlVendedor = xml.crearDocumento(); // Creamos un documento de Vendedor
+        // Primero creamos una instancia de la clase  para usar los métodos, con cada tipo de dato
+        // que admite en este caso todos los que hereden de "Persona" (Cliente y Vendedor)
+        // Esto en si se podría hacer de otra forma, pero es la manera que he encontrado
+        // para implementar genéricos
+        Xml<Cliente> xmlCliente = new Xml<>();
+        Xml<Vendedor> xmlVendedor = new Xml<>();
+        // Creamos los documentos correspondientes
+        Document docCliente = xmlCliente.crearDocumento(); // Creamos un documento de CLiente
+        Document docVendedor = xmlVendedor.crearDocumento(); // Creamos un documento de Vendedor
 
         // Añadimos el cliente a su xml y vendedor al suyo
-        xml.addPersonaXml(cliente, xmlCliente); // Cliente
-        xml.addPersonaXml(vendedor, xmlVendedor); // Vendedor
+        xmlCliente.addPersonaXml(cliente, docCliente); // Cliente
+        xmlVendedor.addPersonaXml(vendedor, docVendedor); // Vendedor
 
         // Listamos los clientes de su xml y los vendedores del suyo
-        xml.listarCliente(xmlCliente);
-        xml.listarVendedores(xmlVendedor);
+        System.out.println();
+        System.out.println("Vamos a listar los Clientes del XML dedicado a los clientes.");
+        xmlCliente.listar(docCliente);
+        System.out.println();
+        System.out.println("Vamos a listar los Vendedores del XML dedicado a los vendedores.");
+        xmlVendedor.listar(docVendedor);
 
         // PRUEBA DE MÉTODOS (add, eliminar, buscar y editar)
         // A continuación vamos a agregar los objetos a los arrays o arrayList correspondientes,
@@ -102,11 +111,14 @@ public class Test {
         // BUSCAR (VENTAS) (con este método además de verificar su funcionamiento, comprobamos que se haya añadido
         // CLIENTE
         // Llamamos al método y le pasamos el objeto de Venta en caso de encontrarlo nos lo devuelve y lo mostramos
-        System.out.println(cliente.buscarVenta(venta)); // En caso de no añadirse nos devuelve "null"
+        System.out.println("Vamos a buscar la venta en los arrayList (listados) de CLiente y Vendedor.");
+        System.out.println("Se ha encontrado la venta: " + cliente.buscarVenta(venta)
+                + " en el arrayList de Cliente."); // En caso de no añadirse nos devuelve "null"
         // VENDEDOR
         // Llamamos al método y le pasamos el objeto de Venta en caso de encontrarlo nos lo devuelve y lo mostramos
         // debe aparecer el mismo objeto de Venta que en cliente, ya que le hemos pasado el mismo
-        System.out.println(vendedor.buscarVenta(venta)); // En caso de no añadirse nos devuelve "null"
+        System.out.println("Se ha encontrado la venta: " + vendedor.buscarVenta(venta)
+                + " en el arrayList de Vendedor."); // En caso de no añadirse nos devuelve "null"
 
 
         // --------------------------------
@@ -126,16 +138,21 @@ public class Test {
         cliente.modificarVenta(venta,nuevaVenta);
         // Buscamos el nuevo objeto en el ArrayList para ver si ha sustituido al anterior
         // Mostramos la nueva venta dentro del listado para verificar que se haya añadido
-        System.out.println(cliente.buscarVenta(nuevaVenta));
+        System.out.println();
+        System.out.println("Ventas con nuevo Cliente (modificada):");
+        System.out.println("Se ha encontrado la venta: " + cliente.buscarVenta(nuevaVenta)
+                + " en el arrayList de Cliente.");
 
         // VENDEDOR
         // Llamamos al método y le pasamos la "venta" anterior, ya que tiene que buscarla, y la nueva, para que la sustituye
         vendedor.modificarVenta(venta,nuevaVenta);
         // Buscamos el nuevo objeto en el ArrayList para ver si ha sustituido al anterior
         // Mostramos la nueva venta dentro del listado para verificar que se haya añadido
-        System.out.println(vendedor.buscarVenta(nuevaVenta));
-
+        System.out.println("Se ha encontrado la venta: " + vendedor.buscarVenta(nuevaVenta)
+                + " en el arrayList de Vendedor.");
+        System.out.println();
         // --------------------------------
+        System.out.println("Ahora vamos a eliminar.");
         // ELIMINAR (eliminamos los objetos de Venta existentes en los listados, y volvemos a llamar a "buscar" para
         // verificar que no se encuentre)
         // CLIENTE
@@ -144,7 +161,7 @@ public class Test {
         cliente.eliminarVenta(nuevaVenta); // Eliminamos la nueva venta
         // Al haber eliminado dicha venta, esto debe devolvernos null, así que lo evaluamos con un condicional
         if(cliente.buscarVenta(nuevaVenta) == null) {
-            System.out.println("La venta se ha eliminado correctamente.");
+            System.out.println("La venta se ha eliminado correctamente del arrayList de Cliente.");
         } else System.out.println("La venta no se ha eliminado.");
 
         // VENDEDOR
@@ -153,7 +170,7 @@ public class Test {
         vendedor.eliminarVenta(nuevaVenta); // Eliminamos la nueva venta
         // Al haber eliminado dicha venta, esto debe devolvernos null, así que lo evaluamos con un condicional
         if(vendedor.buscarVenta(nuevaVenta) == null) {
-            System.out.println("La venta se ha eliminado correctamente.");
+            System.out.println("La venta se ha eliminado correctamente del arrayList de Vendedor.");
         } else System.out.println("La venta no se ha eliminado.");
     }
 }

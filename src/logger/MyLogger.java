@@ -28,7 +28,7 @@ public class MyLogger {
         // compilación (comprobado), al detectar que vamos a leer de un fichero,
         // ya que puede darse que dicho fichero no exista
         try {
-            LogManager.getLogManager().readConfiguration(new FileInputStream("src/myloggin.properties"));
+            LogManager.getLogManager().readConfiguration(new FileInputStream("src/mylogging.properties"));
         } catch (IOException e) {
             e.printStackTrace();
         }

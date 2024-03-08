@@ -63,7 +63,7 @@ public class Producto implements Comparable {
      * @param precio es el precio del producto.
      */
     public Producto(String referencia, int marca, int modelo,
-                     int categoria, float precio) {
+                    int categoria, float precio) {
         // Ponemos el String pasado a referencia como minúscula y le quitamos los espacios
         // que le hayan podido introducir, con esto evitamos que de la misma referencia
         // se introduzcan más de un String diferente

@@ -63,4 +63,17 @@ public final class Cliente extends Persona {
         return codigoCliente;
     }
 
+    @Override
+    public String toString() {
+        return "Cliente{" +
+                "codigoCliente=" + codigoCliente +
+                ", nif='" + nif + '\'' +
+                ", nombre='" + nombre + '\'' +
+                ", direccion='" + direccion + '\'' +
+                ", correo='" + correo + '\'' +
+                ", telefono=" + telefono +
+                ", edad=" + edad +
+                ", fechaNac=" + fechaNac +
+                '}';
+    }
 }

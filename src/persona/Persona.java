@@ -89,7 +89,7 @@ public abstract class Persona {
      * @param correo Se trata del correo de la persona
      */
     public Persona( String nif, String nombre,  LocalDate fechaNac,
-                   String direccion, String correo) {
+                    String direccion, String correo) {
         this(nif,nombre, fechaNac);
         this.direccion = direccion;
         // Validamos el formato del correo llamando al método set que tiene las comprobaciones
@@ -103,7 +103,7 @@ public abstract class Persona {
     }
     // Cuarto constructor, llamamos al segundo y además pedimos el teléfono
     public Persona( String nif, String nombre, int telefono, LocalDate fechaNac,
-                   String direccion, String correo) {
+                    String direccion, String correo) {
         this(nif, nombre, fechaNac, direccion, correo);
         this.telefono = telefono;
     }
@@ -287,11 +287,11 @@ public abstract class Persona {
      * -2 si el parámetro no es válido.
      */
     public Venta buscarVenta(Venta venta) {
-        // En primer lugar ordenamos el arrayList haciendo uso del método "sort", pero de la interfaz
-        // colection en este caso, ya que no es un array normal
-        Collections.sort(listadoVentas);
         // Evaluamos que sea una instancia de "Factura" y que no sea un valor nulo
         if(venta!=null) {
+            // En primer lugar ordenamos el arrayList haciendo uso del método "sort", pero de la interfaz
+            // colection en este caso, ya que no es un array normal
+            Collections.sort(listadoVentas);
             // Creamos un iterador para recorrer el arrayList
             // CRITERIO: Se han utilizado iteradores para recorrer los elementos de las listas (10%).
             Iterator<Venta> it = listadoVentas.iterator();
@@ -307,14 +307,11 @@ public abstract class Persona {
                     return venta;
                 }
             }
-            // En caso de recorrer el arrayList y no encontrar coincidencia
-            // devolvemos "null"
-            return null;
-        } else {
-            // En caso de que el objeto pasado sea nulo, devolvemos "null"
-            return null;
         }
-
+        // En caso de recorrer el arrayList y no encontrar coincidencia
+        // devolvemos "null"
+        // En caso de que el objeto pasado sea nulo, devolvemos "null"
+        return null;
     }
     // Eliminar Venta
     /**
@@ -324,17 +321,15 @@ public abstract class Persona {
      */
     public boolean eliminarVenta(Venta venta) {
         // Evaluamos la nulidad del objeto pasado
-        if(venta!=null) {
-            // Si no es nulo, llamamos al método "remove", que verifica si dicho objeto existe en el arrayLIst,
-            // y en caso afirmativo lo elimina
-            // Como el método nos devuelve un booleano, lo aprovechamos y lo devolvemos
-            return listadoVentas.remove(venta);
-        } else {
+        if(venta==null) {
             // En caso de ser nulo, devolvemos un valor "false"
             return false;
         }
+        // Si no es nulo, llamamos al método "remove", que verifica si dicho objeto existe en el arrayLIst,
+        // y en caso afirmativo lo elimina
+        // Como el método nos devuelve un booleano, lo aprovechamos y lo devolvemos
+        return listadoVentas.remove(venta);
     }
-
 
     // Editar venta
     /**
@@ -345,27 +340,23 @@ public abstract class Persona {
      */
     public boolean modificarVenta(Venta ventaBuscar, Venta ventaNueva) {
         // Evaluamos que los dos objetos no sean nulos
-        if((ventaBuscar != null) && (ventaNueva != null)) {
-            // Llamamos al método "indexOf" para averiguar la posición del elemento que buscamos en el ArrayList
-            int posicion = listadoVentas.indexOf(ventaBuscar);
-            // Aprovechando que "indexOf", nos devulve un -1 en caso de no encontrar el objeto en el ArrayList
-            // y evaluamos que la posición sea mayor o igual a 0
-            if(posicion>=0) {
-                // En primer lugar, le asignamos al nuevo objeto, el id del viejo
-                ventaNueva.setId(listadoVentas.get(posicion).getId());
-                // Asignamos el nuevo Objeto, en la posición del antiguo
-                listadoVentas.set(posicion, ventaNueva);
-                // Si se ha modificado el objeto correctamente, devolvemos un true
-                return true;
-            } else {
-                // Si no se encuentra devolvemos "false"
-                return false;
-            }
-        } else {
-            // En caso de haber alguno nulo, devolvemos "false
+        if((ventaBuscar == null) && (ventaNueva == null)) {
             return false;
         }
-
+        // Llamamos al método "indexOf" para averiguar la posición del elemento que buscamos en el ArrayList
+        int posicion = listadoVentas.indexOf(ventaBuscar);
+        // Aprovechando que "indexOf", nos devuelve un -1 en caso de no encontrar el objeto en el ArrayList
+        // y evaluamos que la posición sea menor a 0
+        if(posicion < 0) {
+            // Si no se encuentra devolvemos "false"
+            return false;
+        }
+        // En primer lugar, le asignamos al nuevo objeto, el id del viejo
+        ventaNueva.setId(listadoVentas.get(posicion).getId());
+        // Asignamos el nuevo Objeto, en la posición del antiguo
+        listadoVentas.set(posicion, ventaNueva);
+        // Si se ha modificado el objeto correctamente, devolvemos un true
+        return true;
     }
 
 

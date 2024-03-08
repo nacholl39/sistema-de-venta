@@ -2,6 +2,7 @@ package venta;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 
 
 import persona.Cliente;
@@ -99,7 +100,7 @@ public class Factura implements Comparable {
         // Evaluamos si el objeto esta a "null"
         if(objeto==null) throw new IllegalArgumentException("El parámetro no puede ser nulo");
         // Evaluamos si el objeto es una instancia de "Factura"
-        if(!(objeto instanceof Factura)) throw new IllegalArgumentException("El parámetro debe ser del tipo Empleado");
+        if(!(objeto instanceof Factura)) throw new IllegalArgumentException("El parámetro debe ser del tipo Factura");
         // Comparamos si la factura pasada es mayor(1), menor(-1) o son iguales (0)
         if(((Factura)objeto).getId()==this.getId()) {
             // Si son iguales devolvemos un 0
@@ -273,4 +274,19 @@ public class Factura implements Comparable {
         return fechaHora;
     }
 
+    @Override
+    public String toString() {
+        return "Factura{" +
+                "id=" + id +
+                ", fechaHora=" + fechaHora +
+                ", fechaHoraFormateada='" + fechaHoraFormateada + '\'' +
+                ", cliente=" + cliente +
+                ", vendedor=" + vendedor +
+                ", venta=" + venta +
+                ", detallesFactura=" + Arrays.toString(detallesFactura) +
+                ", importeTotalSinImpuestos=" + importeTotalSinImpuestos +
+                ", importeTotalConImpuestos=" + importeTotalConImpuestos +
+                ", impuestos=" + impuestos +
+                '}';
+    }
 }
