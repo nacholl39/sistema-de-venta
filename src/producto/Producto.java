@@ -1,10 +1,14 @@
 package producto;
 
-import org.eclipse.jdt.annotation.NonNull;
 
+import logger.MyLogger;
 import venta.DetalleFactura;
 import venta.Factura;
 import venta.Venta;
+import java.sql.*;
+
+import java.sql.Connection;
+import java.util.logging.Logger;
 
 /**
  * Esta clase hace referencia a los distintos productos de nuestro sistema de
@@ -32,7 +36,13 @@ public class Producto implements Comparable {
     // Constantes de Modelos (Aceites) (Repsol)
     private final int PREMIUM=1, ELITE=2;
     private DetalleFactura detalleFactura;
+    protected static Logger logger;
     private AtributoCategoria[] atributosCategoria;
+    // Bloque estático
+    static {
+        // Inicializamos el logger estático para que nos sirva para la clase en general
+        logger = MyLogger.getLogger("A");
+    }
     // Bloque de inicializacion de instancia
     {
         // Le damos al array de Atributos un tamaño de 3
@@ -63,8 +73,8 @@ public class Producto implements Comparable {
      * @param categoria categoria del producto, se verifica con el método comprobarCategoria.
      * @param precio es el precio del producto.
      */
-    public Producto(@NonNull String referencia, @NonNull int marca, @NonNull int modelo,
-                    @NonNull int categoria, @NonNull float precio) {
+    public Producto(String referencia, int marca, int modelo,
+                     int categoria, float precio) {
         // Ponemos el String pasado a referencia como minúscula y le quitamos los espacios
         // que le hayan podido introducir, con esto evitamos que de la misma referencia
         // se introduzcan más de un String diferente
@@ -78,8 +88,8 @@ public class Producto implements Comparable {
         this.precio = precio;
     }
     // Segundo constructor, llamamos al primero, y además le pasamos la decripción
-    public Producto(@NonNull String referencia, @NonNull int marca, @NonNull int modelo,
-                    @NonNull int categoria, @NonNull float precio, @NonNull String descripcion) {
+    public Producto( String referencia, int marca, int modelo,
+                     int categoria, float precio, String descripcion) {
         // Llamamos al primer constructor
         this(referencia, marca, modelo, categoria, precio);
         // Asignamos la descripción
@@ -164,128 +174,120 @@ public class Producto implements Comparable {
     }
 
     // Añadir AtributoCategoria
-    /**
-     * Método para añadir un atributos de categoria del producto al listado de estos
-     * del propio producto.
-     * @param atributoCategoria atributos de categoria que va a ser añadido.
-     * @return true si el atributo se ha añadido correctamente, false en caso contrario.
-     */
-    public boolean addAtributoCategoria(AtributoCategoria atributoCategoria) {
-        // Inicializamos un constador para recorrer el listado de Facturas
-        int contador=0;
-        // Evaluamos que sea una instancia de "Venta" y que no sea un valor nulo
-        if(atributoCategoria!=null) {
-            // Recorremos el listado de AtributoCategoria, y añadimos la AtributoCategoria donde
-            // el valor sea Null es decir, donde este vacío. Como no sabemos cuando será, usamos do,while
-            do {
-                if(atributosCategoria[contador] == null) {
-                    // Añadimos el atributoCategoria al array
-                    atributosCategoria[contador] = atributoCategoria;
-                    // Si se ha agregado devolvemos un true y así salimos del bucle también
-                    return true;
-                }
-                // Incrementamos el contador
-                contador++;
-                // Evaluamos en la condición que contador no supere al tamaño del array
-            } while((contador<atributosCategoria.length));
+    public boolean addAtributoCategoria(Connection conexion, AtributoCategoria atributoCategoria) {
+        // Comprobamos la nulidad
+        if(atributoCategoria == null) {
+            logger.info("El objeto Atributo Producto es nulo.");
+            return false;
         }
-        // Si no se ha añadido correctamente devolvemos "false"
-        return false;
+        // Creamos la sentencia sql
+        String sql = "INSERT INTO atributoCategoria (idAtributo, atributo, valor, unidad" +
+                ", referenciaProducto) VALUES ?, ?, ?, ?, ?";
+        try {
+            // Creamos un objeto de PreparedStatement y le pasamos la consulta creada
+            PreparedStatement statement = conexion.prepareStatement(sql);
+            // Ahora le pasamos los valores de los atributos
+            statement.setInt(1, atributoCategoria.getId());
+            statement.setString(2, atributoCategoria.getAtributo());
+            statement.setString(3, atributoCategoria.getValor());
+            statement.setString(4, atributoCategoria.getUnidad());
+            statement.setString(5, atributoCategoria.getProducto().getReferencia());
+            // Ejecutamos la sentencia
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            logger.info(e.getMessage());
+        }
+        logger.info("Atributo categoría añadido correctamente");
+        return true;
     }
 
     // Buscar AtributoCategoria
-    /**
-     * Método para buscar un atributo en el listado de atributos del producto.
-     * @param atributoCategoria es el atributo que se va a buscar.
-     * @return El índice de la factura en el listado si se encuentra, -1 si no se encuentra,
-     * -2 si el parámetro no es válido.
-     */
-    public int buscarAtributoCategoria(AtributoCategoria atributoCategoria) {
-        // Inicializamos un contador para recorrer el array
-        int contador=0;
-        // Evaluamos que sea una instancia de "Factura" y que no sea un valor nulo
-        if(atributoCategoria!=null) {
-            // Recorremos el array de Facturas, como no sabemos cuando encontraremos la factura
-            // emplearemos un bucle do,while
-            do {
-                // Usamos la interfaz comparable de "Factura" para evaluar si son iguales
-                if(atributosCategoria[contador].compareTo(atributoCategoria) == 0) {
-                    // Salimos del bucle si se ha cumplido la condición
-                    // Con eso conseguimos que contador se quede con el valor de la posición
-                    return contador;
-                }
-                // Incrementamos el contador
-                contador++;
-                // Evaluamos que contador no supere el tamaño del array
-            } while((contador<atributosCategoria.length));
-            // Retornamos el valor -1 si no se ha encontrado ninguna
-            return -1;
+    public String buscarAtributoCategoria(Connection conexion, AtributoCategoria atributoCategoria) {
+        // Primero comprobamos la nulidad
+        if(atributoCategoria == null) {
+            logger.info("Objeto atributo categoría nulo");
+            return null;
         }
-        // Devolvemos un -2 en caso de que el parámetro no sea válido (nulo o de otro tipo)
-        else return -2;
+        // Preparamos la consulta
+        String sql = "SELECT * FROM atributoCategoria WHERE idAtributo = ?";
+        try {
+            // Creamos un objeto de PreparedStatement y le pasamos la consulta
+            PreparedStatement statement = conexion.prepareStatement(sql);
+            // Ahora le asignamos el valor al campo "?"
+            statement.setInt(1, atributoCategoria.getId());
+            // Ejecutamos la sentencia y guardamos el resultado en un objeto de ResultSet
+            // Como es una consulta SELECT, lo ejecutamos con executeQuery, ya que no vamos
+            // a modificar ningún registro
+            ResultSet rs = statement.executeQuery();
+            // Utilizamos el objeto de ResultSet, para recorrer los diferentes resultados de
+            // la consulta con un bucle while, aunque como estamos filtrando por el ID, solo
+            // nos va a devolver un único registro, y por tanto se ejecutará una sola vez
+            while (rs.next()) {
+                String resultadoString = "AtributoCategoria encontrado: \nID: " + rs.getInt("idAtributo")
+                        + "\natributo: " + rs.getString("atributo")
+                        + "\nvalor: " + rs.getString("valor")
+                        + "\nunidad: " + rs.getString("unidad")
+                        + "\nreferenciaProducto: " + rs.getString("referenciaProducto");
+                logger.info("Atributo Producto encontrado.");
+                return resultadoString;
+            }
+        } catch (SQLException e) {
+            logger.info(e.getMessage());
+        }
+        // Si no se ha encontrado se devolvera null
+        return null;
     }
     // Eliminar AtributoCategoria
-    /**
-     * Método para eliminar un atributo del listado de atributos del producto.
-     * @param atributoCategoria es el atributo que se va a eliminar.
-     * @return true si el atributo se ha eliminado correctamente, false en caso contrario.
-     */
-    public boolean eliminarAtributoCategoria(AtributoCategoria atributoCategoria) {
-        // Llamamos al método "buscarVenta" para encontrar la posición del elemento a
-        // eliminar y le asignamos el valor a una variable
-        int posicion = buscarAtributoCategoria(atributoCategoria);
-        // Inicializamos un nuevo array de Ventas
-        AtributoCategoria[] nuevoAtributosCategoria = new AtributoCategoria[10];
-        // Evaluamos que la posición devuelta sea mayor o igual a 0, ya que en caso contrario
-        // significa que el objeto venta es nulo, de otro tipo o no se ha encontrado
-        if(posicion>=0) {
-            // Inicializamos un contador para recorrer el array nuevo
-            int contador=0;
-            // Recorremos el array de Ventas y la guardamos mientras no coincida, en el nuevo array
-            // asi obtenemos un nuevo array usamos un bucle for porque debemos recorrerlo entero
-            for(int i=0; i<atributosCategoria.length; i++) {
-                // Si no coincide la variable iteradora con la posición que deseamos eliminar,
-                // la almacenamos e incrementamos el contador de posiciones del nuevo
-                // array, en caso contrario no, así conseguimos que no se quede el hueco
-                // de la posición que hemos eliminado en el nuevo listado
-                if(i!=posicion) {
-                    nuevoAtributosCategoria[contador] = atributosCategoria[i];
-                    // Incrementamos el contador
-                    contador++;
-                }
-            }
-            // Reasignamos al listado de facturas el nuevo listado
-            setAtributosCategoria(nuevoAtributosCategoria);
-            // Devolvemos un true para verificar que se ha hecho correctamente
-            return true;
+    public boolean eliminarAtributoCategoria(Connection conexion, AtributoCategoria atributoCategoria) {
+        // Comprobamos la nulidad
+        if(atributoCategoria == null) {
+            logger.info("El objeto atributoCategoría es nulo.");
+            return false;
         }
-        // Devolvemos false, en caso de que no se haya eliminado ningun elemento y siga igual
+        // Creamos la sentencia SQL
+        String sql = "DELETE FROM atributoCategoria WHERE idAtributo = ?";
+        try {
+            // Creamos un objeto de PreparedStatement
+            PreparedStatement statement = conexion.prepareStatement(sql);
+            // Le pasamos el valor
+            statement.setInt(1, atributoCategoria.getId());
+            // Ejecutamos la sentencia
+            statement.executeUpdate();
+            logger.info("AtributoCategoria eliminada");
+            return true;
+        } catch (SQLException e) {
+            logger.info(e.getMessage());
+        }
         return false;
     }
+
+
     // Editar AtributoCategoria
-    /**
-     * Método para modificar un atributo en el listado de atributos del producto.
-     * @param atributoCategoriaBuscar atributo que se va a buscar y modificar.
-     * @param atributoCategoriaNueva atributo nuevo que va reemplazará al atributo antiguo.
-     * @return true si el atributo se ha modificado correctamente, false en caso contrario.
-     */
-    public boolean modificarAtributoCategoria(AtributoCategoria atributoCategoriaBuscar,
-                                              AtributoCategoria atributoCategoriaNueva) {
-        // Llamamos al método buscar venta para localizar la venta a modificar
-        // y guardamos la posición en una variable
-        int posicion = buscarAtributoCategoria(atributoCategoriaBuscar);
-        // Evaluamos que la posición devuelta sea mayor o igual a 0, ya que en caso contrario
-        // significa que el objeto factura es nulo, de otro tipo o no se ha encontrado
-        if(posicion>=0) {
-            // Se lo asignamos a la factura nueva el identificador de la antigua
-            atributoCategoriaNueva.setId(atributosCategoria[posicion].getId());
-            // Le asignamos al objeto de factura en esa posición, los nuevos valores, que
-            // son los del objeto "facturaNueva"
-            atributosCategoria[posicion] = atributoCategoriaNueva;
-            // Devolvemos un true para verificar que se ha hecho correctamente
-            return true;
+    public boolean modificarAtributoCategoria(Connection conexion, AtributoCategoria atributoCategoria) {
+        // Comprobamos la nulidad
+        if(atributoCategoria == null) {
+            logger.info("El objeto atributoCategoria es nulo.");
+            return false;
         }
-        // Devolvemos false, en caso de que no se haya modficado ningun elemento y siga igual
+        // Creamos la sentencia
+        String sql = "UPDATE atributoCategoria SET atributo = ?, valor = ?, unidad = ?," +
+                "referenciaProducto = ? WHERE idAtributo = ?";
+        try {
+            // Creamos un objeto de PreparedStatement y le pasamos la sentencia anterior
+            PreparedStatement statement = conexion.prepareStatement(sql);
+            // Le pasamos los valores de los campos
+            statement.setString(1, atributoCategoria.getAtributo());
+            statement.setString(2, atributoCategoria.getValor());
+            statement.setString(3, atributoCategoria.getUnidad());
+            statement.setString(4, atributoCategoria.getProducto().getReferencia());
+            statement.setInt(5, atributoCategoria.getId());
+            // Ejecutamos la consulta con "executeUpdate" ya que vamos a modificar valores
+            statement.executeUpdate();
+            logger.info("Atributo Producto Modificado");
+            return true;
+        } catch (SQLException e) {
+            logger.info(e.getMessage());
+        }
         return false;
     }
 
