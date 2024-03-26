@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2024-03-26T19:42:02.300630800Z</date>
+  <millis>1711482122300</millis>
+  <nanos>630800</nanos>
+  <sequence>3</sequence>
+  <logger>A</logger>
+  <level>INFO</level>
+  <class>pruebas.Test</class>
+  <method>addPersona</method>
+  <thread>1</thread>
+  <message>Persona añadida</message>
+</record>
+<record>
+  <date>2024-03-26T19:42:02.391942200Z</date>
+  <millis>1711482122391</millis>
+  <nanos>942200</nanos>
+  <sequence>4</sequence>
+  <logger>A</logger>
+  <level>INFO</level>
+  <class>pruebas.Test</class>
+  <method>addPersona</method>
+  <thread>1</thread>
+  <message>Persona añadida</message>
+</record>
+<record>
+  <date>2024-03-26T19:42:02.434072300Z</date>
+  <millis>1711482122434</millis>
+  <nanos>72300</nanos>
+  <sequence>5</sequence>
+  <logger>A</logger>
+  <level>INFO</level>
+  <class>persona.Persona</class>
+  <method>addVenta</method>
+  <thread>1</thread>
+  <message>Venta añadida</message>
+</record>
+<record>
+  <date>2024-03-26T19:42:02.475208400Z</date>
+  <millis>1711482122475</millis>
+  <nanos>208400</nanos>
+  <sequence>6</sequence>
+  <logger>A</logger>
+  <level>INFO</level>
+  <class>persona.Persona</class>
+  <method>addFactura</method>
+  <thread>1</thread>
+  <message>Factura añadida</message>
+</record>
+<record>
+  <date>2024-03-26T19:42:02.497282600Z</date>
+  <millis>1711482122497</millis>
+  <nanos>282600</nanos>
+  <sequence>7</sequence>
+  <logger>A</logger>
+  <level>INFO</level>
+  <class>persona.Persona</class>
+  <method>buscarFactura</method>
+  <thread>1</thread>
+  <message>Factura encontrada</message>
+</record>
+<record>
+  <date>2024-03-26T19:42:02.502298700Z</date>
+  <millis>1711482122502</millis>
+  <nanos>298700</nanos>
+  <sequence>8</sequence>
+  <logger>A</logger>
+  <level>INFO</level>
+  <class>persona.Persona</class>
+  <method>buscarVenta</method>
+  <thread>1</thread>
+  <message>Venta encontrada</message>
+</record>
+<record>
+  <date>2024-03-26T19:42:02.562497200Z</date>
+  <millis>1711482122562</millis>
+  <nanos>497200</nanos>
+  <sequence>9</sequence>
+  <logger>A</logger>
+  <level>INFO</level>
+  <class>pruebas.Test</class>
+  <method>addPersona</method>
+  <thread>1</thread>
+  <message>Persona añadida</message>
+</record>
+<record>
+  <date>2024-03-26T19:42:02.646776500Z</date>
+  <millis>1711482122646</millis>
+  <nanos>776500</nanos>
+  <sequence>10</sequence>
+  <logger>A</logger>
+  <level>INFO</level>
+  <class>persona.Persona</class>
+  <method>modificarFactura</method>
+  <thread>1</thread>
+  <message>Factura modificada</message>
+</record>
+<record>
+  <date>2024-03-26T19:42:02.726038Z</date>
+  <millis>1711482122726</millis>
+  <nanos>38000</nanos>
+  <sequence>11</sequence>
+  <logger>A</logger>
+  <level>INFO</level>
+  <class>persona.Persona</class>
+  <method>modificarVenta</method>
+  <thread>1</thread>
+  <message>Venta modificada</message>
+</record>
+<record>
+  <date>2024-03-26T19:42:02.728046400Z</date>
+  <millis>1711482122728</millis>
+  <nanos>46400</nanos>
+  <sequence>12</sequence>
+  <logger>A</logger>
+  <level>INFO</level>
+  <class>persona.Persona</class>
+  <method>buscarFactura</method>
+  <thread>1</thread>
+  <message>Factura encontrada</message>
+</record>
+<record>
+  <date>2024-03-26T19:42:02.730052Z</date>
+  <millis>1711482122730</millis>
+  <nanos>52000</nanos>
+  <sequence>13</sequence>
+  <logger>A</logger>
+  <level>INFO</level>
+  <class>persona.Persona</class>
+  <method>buscarVenta</method>
+  <thread>1</thread>
+  <message>Venta encontrada</message>
+</record>
+<record>
+  <date>2024-03-26T19:42:02.767174300Z</date>
+  <millis>1711482122767</millis>
+  <nanos>174300</nanos>
+  <sequence>14</sequence>
+  <logger>A</logger>
+  <level>INFO</level>
+  <class>persona.Persona</class>
+  <method>eliminarFactura</method>
+  <thread>1</thread>
+  <message>Factura eliminada</message>
+</record>
+<record>
+  <date>2024-03-26T19:42:02.888575600Z</date>
+  <millis>1711482122888</millis>
+  <nanos>575600</nanos>
+  <sequence>15</sequence>
+  <logger>A</logger>
+  <level>INFO</level>
+  <class>persona.Persona</class>
+  <method>eliminarVenta</method>
+  <thread>1</thread>
+  <message>Venta eliminada</message>
+</record>
+</log>
