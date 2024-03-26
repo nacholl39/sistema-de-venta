@@ -15,6 +15,7 @@ public class AtributoCategoria implements Comparable {
     private static int contador;
     private int id;
     private String atributo, valor, unidad;
+    private Producto producto;
     // Bloque de inicialización estático
     static {
         contador = 0;
@@ -86,5 +87,11 @@ public class AtributoCategoria implements Comparable {
     public void setUnidad(String unidad) {
         this.unidad = unidad;
     }
+    public void setProducto(Producto producto) {
+        this.producto = producto;
+    }
 
+    public Producto getProducto() {
+        return producto;
+    }
 }

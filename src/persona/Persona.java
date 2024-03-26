@@ -5,13 +5,15 @@ import java.time.LocalDate;
 import logger.MyLogger;
 
 import java.time.temporal.ChronoUnit;
-import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.sql.*;
 
 import venta.Factura;
 import venta.Venta;
+
+import javax.swing.*;
 
 /**
  * Esta clase abstracta hace referencia a una persona dentro del sistema de ventas.
@@ -25,39 +27,11 @@ public abstract class Persona {
     protected String nif, nombre, direccion, correo;
     protected int telefono, edad;
     protected LocalDate fechaNac;
-    // CRITERIO: Se han reconocido las librerías de clases relacionadas con tipos de datos avanzados (5%).
-    // CRITERIO: Se han utilizado listas para almacenar y procesar información (15%).
-    // He cambiado el array de ventas, por un arrayList, y he modificado
-    // los métodos relacionados con dicho ArrayList (buscar, add, eliminar y modificar)
-    // por lo que en dichos métodos relacionados con el listado de ventas
-    // también podrás ver el uso de los métodos de los arrayList
-    // para cubrir los criterios
-    /*
-     Se ha reconocido las ventajas de los tipos de las distintas estructuras de datos
-     ya que la idea era utilizar "HashSet" en vez de "ArrayList", debido a que "HashSet"
-     no permite valores duplicados y no debe exister la posibilidad de que haya dos facturas
-     en el mismo listado.
-     Pero debido a que el criterio "c" dice que utilicemos "listas" he optado por usar ArrayList
-     para cumplir con dicho criterio.
-     */
-    protected ArrayList<Venta> listadoVentas;
-    // En el caso del listado de Facturas, lo he dejado como un array
-    // normal, para poder hacer uso de los métodos de la clase Arrays
-    // y cumplir con el criterio "a"
-    // Puede verse en el método "buscarFactura" en el hacemos uso de "sort"
-    // para ordenar el array antes de recorrerlo, aprovechando que la
-    // clase "Factura" tiene implementada la interfaz "comparable"
-    protected Factura[] listadoFacturas;
     protected static Logger logger;
     // Bloque estático
     static {
         // Inicializamos el logger estático para que nos sirva para la clase en general
         logger = MyLogger.getLogger("A");
-    }
-    // Bloque inicialización
-    {
-        listadoVentas = new ArrayList<>();
-        listadoFacturas = new Factura[10];
     }
     /**
      * Este constructor inicializa una instancia de la clase "Persona" con los datos
@@ -117,255 +91,236 @@ public abstract class Persona {
      * Al ser abstracta será sobreescrita por las clases hijas.
      */
     public abstract void mostrarInformacion();
+
     // FACTURA
     // Añadir Factura
-    /**
-     * Método para añadir una factura al listado de facturas de la persona.
-     * @param factura factura que va a ser añadida.
-     * @return true si la factura se ha añadido correctamente, false en caso contrario.
-     */
-    public boolean addFactura(Factura factura) {
-        // Inicializamos un constador para recorrer el listado de Facturas
-        int contador=0;
-        // Evaluamos que sea una instancia de "Factura" y que no sea un valor nulo
-        if(factura!=null) {
-            // Recorremos el listado de facturas, y añadimos la factura donde el valor sea Null
-            // es decir, donde este vacío. Como no sabemos cuando será, usamos do,while
-            do {
-                if(listadoFacturas[contador] == null) {
-                    // Añadimos la factura al array
-                    listadoFacturas[contador] = factura;
-                    // Trazamos que se ha añadido
-                    logger.info("Factura añadida correctamente");
-                    // Si se ha agregado devolvemos un true y así salimos del bucle también
-                    return true;
-                }
-                // Incrementamos el contador
-                contador++;
-                // Evaluamos en la condición que contador no supere al tamaño del array
-            } while((contador<listadoFacturas.length));
+    public boolean addFactura(Connection conexion, Factura factura) {
+        if(factura != null) {
+            // Preparamos la sentencia SQL para insertar una venta en la base de datos
+            String sql = "INSERT INTO factura (idFactura, fechaHora, idCliente, idVendedor, idVenta, " +
+                    "importeTotalSinImpuestos, importeTotalConImpuestos, impuestos) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            try {
+                // Creamos un PreparedStatement a partir de la sentencia SQL
+                PreparedStatement statement = conexion.prepareStatement(sql);
+                // Asignamos los valores de la venta a los parámetros de la sentencia SQL
+                // Insertamos los valores de los atributos del objeto en la posición correspondiente
+                // en el mismo orden de los campos a los que hace rerferencia
+                statement.setInt(1, factura.getId()); // Insertamos ID
+                // Para el campo fechaHora, al ser de tipo LocalDateTime, tenemos que pasarlo a
+                // tipo "Timestamp" y emplear el método correspondiente "setTimestamp"
+                statement.setTimestamp(2, Timestamp.valueOf(factura.getFechaHora())); // Insertamos fechaHora
+                statement.setInt(3, factura.getCliente().getId());
+                statement.setInt(4, factura.getVendedor().getId());
+                statement.setInt(5, factura.getVenta().getId());
+                statement.setDouble(6, factura.getImporteTotalSinImpuestos());
+                statement.setDouble(7, factura.getImporteTotalConImpuestos());
+                statement.setDouble(8, factura.getImpuestos());
+                // Ejecutamos la sentencia SQL
+                statement.executeUpdate();
+                logger.info("Factura añadida");
+                return true;
+            } catch (SQLException e) {
+                // Usamos el logger para trazar el mesaje de la excepción
+                logger.info(e.getMessage());
+            }
         }
-        // Si no se ha añadido correctamente devolvemos "false" y trazamos el mensaje
-        logger.info("Factura no añadida correctamente");
+        logger.info("Factura no añadida");
         return false;
     }
     // Buscar Factura
-    /**
-     * Método para buscar una factura en el listado de facturas de la persona.
-     * @param factura factura que se va a buscar en el listado.
-     * @return El índice de la factura en el listado si se encuentra, -1 si no se encuentra,
-     * -2 si el parámetro no es válido.
-     */
-    public int buscarFactura(Factura factura) {
-        // CRITERIO: Se han escrito programas que utilicen arrays (15%)
-        // Ordenamos el array con el método "sort"
-        Arrays.sort(listadoFacturas);
-        // Inicializamos un contador para recorrer el array
-        int contador=0;
-        // Evaluamos que sea una instancia de "Factura" y que no sea un valor nulo
-        if(factura!=null) {
-            // Recorremos el array de Facturas, como no sabemos cuando encontraremos la factura
-            // emplearemos un bucle do,while
-            do {
-                // Usamos la interfaz comparable de "Factura" para evaluar si son iguales
-                if(listadoFacturas[contador].compareTo(factura) == 0) {
-                    // Salimos del bucle si se ha cumplido la condición
-                    // Con eso conseguimos que contador se quede con el valor de la posición
-                    logger.info("Factura encontrada en posición: " + contador);
-                    return contador;
-                }
-                // Incrementamos el contador
-                contador++;
-                // La condición es que el contador siga siendo menor a la longitud, para evitar un fuera
-                // de índice; además de que "facturaBuscada" debe seguir a null, ya que si se ha encontrado
-                // no debemos seguir buscando
-            } while((contador<listadoFacturas.length));
-            // Retornamos el valor -1 si no se ha encontrado ninguna
-            logger.info("Factura no encontrada");
-            return -1;
-        } else {
-            // Devolvemos un -2 en caso de que el parámetro no sea válido (nulo o de otro tipo)
-            logger.info("Factura no válida");
-            return -2;
+    public String buscarFactura(Connection conexion, Factura facturaBuscar) {
+        // Preparamos la sentencia SQL para buscar una venta en la base de datos
+        String sql = "SELECT * FROM factura WHERE idFactura = ?";
+        try {
+            // Creamos un PreparedStatement a partir de la sentencia SQL
+            PreparedStatement statement = conexion.prepareStatement(sql);
+            // Asignamos el valor del id a los parámetros de la sentencia SQL
+            statement.setInt(1, facturaBuscar.getId());
+            // Ejecutamos la sentencia SQL y obtenemos los resultados
+            ResultSet rs = statement.executeQuery();
+            // Si encontramos una venta, la devolvemos, solo lo realizamos una vez, porque solo
+            // debe haber una sola factura con ese ID
+            while(rs.next()) {
+                // Mostramos por consola el resulado de la consulta
+                // Hacemos alusión a los diferentes campos de la consulta mediante su nombre, y nos
+                // traemos su valor mediante el "get" correspondiente
+                String resultadoString = "Factura encontrada: \nID: " + rs.getInt("idFactura")
+                        + "\nfechaHora: " + rs.getTimestamp("fechaHora")
+                        + "\nidCliente: " + rs.getInt("idCliente")
+                        + "\nidVendedor: " + rs.getInt("idVendedor")
+                        + "\nidVenta: " + rs.getInt("idVenta")
+                        + "\nimporteTotalSinImpuestos: " + rs.getDouble("importeTotalSinImpuestos")
+                        + "\nimporteTotalConImpuestos: " + rs.getDouble("importeTotalConImpuestos")
+                        + "\nimpuestos: " + rs.getDouble("impuestos");
+                logger.info("Factura encontrada");
+                return resultadoString;
+            }
+        } catch (SQLException e) {
+            logger.info(e.getMessage());
         }
+        // Si no hemos encontrado la factura devolvemos Null
+        return null;
     }
     // Eliminar Factura
-    /**
-     * Método para eliminar una factura del listado de facturas de la persona.
-     * @param factura factura que se va a eliminar.
-     * @return true si la factura se ha eliminado correctamente, false en caso contrario.
-     */
-    public boolean eliminarFactura(Factura factura) {
-        // Llamamos al método "buscarFactura" para encontrar la posición del elemento a
-        // eliminar y le asignamos el valor a una variable
-        int posicion = buscarFactura(factura);
-        // Inicializamos un nuevo array de facturas
-        Factura[] nuevoListadoFacturas = new Factura[10];
-        // Evaluamos que la posición devuelta sea mayor o igual a 0, ya que en caso contrario
-        // significa que el objeto factura es nulo, de otro tipo o no se ha encontrado
-        if(posicion>=0) {
-            // Inicializamos un contador para recorrer el array nuevo
-            int contador=0;
-            // Recorremos el array de Facturas y la guardamos mientras no coincida, en el nuevo array
-            // asi obtenemos un nuevo array usamos un bucle for porque debemos recorrerlo entero
-            for(int i=0; i<listadoFacturas.length; i++) {
-                // Si no coincide la variable iteradora con la posición que deseamos eliminar,
-                // la almacenamos e incrementamos el contador de posiciones del nuevo
-                // array, en caso contrario no, así conseguimos que no se quede el hueco
-                // de la posición que hemos eliminado en el nuevo listado
-                if(i!=posicion) {
-                    nuevoListadoFacturas[contador] = listadoFacturas[i];
-                    // Incrementamos el contador
-                    contador++;
-                }
-            }
-            // Reasignamos al listado de facturas el nuevo listado
-            setListadoFacturas(nuevoListadoFacturas);
-            // Devolvemos un true para verificar que se ha hecho correctamente
+    public boolean eliminarFactura(Connection conn, Factura factura) {
+        // Preparamos la sentencia SQL para eliminar una venta de la base de datos
+        String sql = "DELETE FROM factura WHERE idFactura = ?";
+        try {
+            // Creamos un PreparedStatement a partir de la sentencia SQL
+            PreparedStatement statement = conn.prepareStatement(sql);
+            // Asignamos el valor del id a los parámetros de la sentencia SQL
+            statement.setInt(1, factura.getId());
+            // Ejecutamos la sentencia SQL
+            statement.executeUpdate();
             logger.info("Factura eliminada");
             return true;
+        } catch (SQLException e) {
+            logger.info(e.getMessage());
         }
-        // Devolvemos false, en caso de que no se haya eliminado ningun elemento y siga igual
-        logger.info("Factura no eliminada");
         return false;
     }
-    // Editar factura
-    /**
-     * Método para modificar una factura en el listado de facturas de la persona.
-     * @param facturaBuscar factura que se va a buscar y modificar.
-     * @param facturaNueva la factura nueva que va reemplazará a la factura antigua.
-     * @return true si la factura se ha modificado correctamente, false en caso contrario.
-     */
-    public boolean modificarFactura(Factura facturaBuscar, Factura facturaNueva) {
-        // Llamamos al método buscar factura para localizar la factura a modificar
-        // y guardamos la posición en una variable
-        int posicion = buscarFactura(facturaBuscar);
-        // Evaluamos que la posición devuelta sea mayor o igual a 0, ya que en caso contrario
-        // significa que el objeto factura es nulo, de otro tipo o no se ha encontrado
-        if(posicion>=0) {
-            // Se lo asignamos a la factura nueva el identificador de la antigua
-            facturaNueva.setId(listadoFacturas[posicion].getId());
-            // Le asignamos al objeto de factura en esa posición, los nuevos valores, que
-            // son los del objeto "facturaNueva"
-            listadoFacturas[posicion] = facturaNueva;
-            // Devolvemos un true para verificar que se ha hecho correctamente
-            logger.info("Factura editada");
-            return true;
+    // Editar Factura
+    public boolean modificarFactura(Connection conexion, Factura facturaNueva, Factura facturaBuscar) {
+        if(facturaNueva == null || facturaBuscar == null) {
+            logger.info("Uno de los dos objetos de Factura es nulo");
+            return false;
         }
-        // Devolvemos false, en caso de que no se haya modficado ningun elemento y siga igual
-        logger.info("Factura no editada");
+        // Preparamos la sentencia SQL para modificar una venta en la base de datos
+        String sql = "UPDATE factura SET fechaHora = ?, idCliente = ?, idVendedor = ?, " +
+                "idVenta = ?, importeTotalSinImpuestos = ?, importeTotalConImpuestos = ?," +
+                "impuestos = ? WHERE idFactura = ?";
+        try {
+            // Creamos un PreparedStatement a partir de la sentencia SQL
+            PreparedStatement statement = conexion.prepareStatement(sql);
+            // Asignamos los valores de la venta a los parámetros de la sentencia SQL
+            statement.setTimestamp(1, Timestamp.valueOf(facturaNueva.getFechaHora()));
+            statement.setInt(2, facturaNueva.getCliente().getId());
+            statement.setInt(3, facturaNueva.getVendedor().getId());
+            statement.setInt(4, facturaNueva.getVenta().getId());
+            statement.setDouble(5, facturaNueva.getImporteTotalSinImpuestos());
+            statement.setDouble(6, facturaNueva.getImporteTotalConImpuestos());
+            statement.setDouble(7, facturaNueva.getImpuestos());
+            // Como el id que es el campo por el cual buscamos, lo vamos a dejar igual,
+            // recurrimos a extraer el id del objeto factura antiguo
+            statement.setInt(8, facturaBuscar.getId());
+            // Ejecutamos la sentencia SQL
+            statement.executeUpdate();
+            logger.info("Factura modificada");
+            return true;
+        } catch (SQLException e) {
+            logger.info(e.getMessage());
+        }
+        // Si hemos llegado hasta aquí significa que ha saltado la execpción y por tanto no se ha
+        // modificado el registro. Devolvemos false para indicarlo
         return false;
     }
 
 
     // VENTA
     // Añadir Venta
-    /**
-     * Método para añadir una venta al listado de ventas de la persona.
-     * @param venta venta que va a ser añadida.
-     * @return true si la factura se ha añadido correctamente, false en caso contrario.
-     */
-    public boolean addVenta(Venta venta) {
-        // Evaluamos que sea una instancia de "Venta" y que no sea un valor nulo
-        if(venta!=null) {
-            // En caso de no ser nulo, añadimos la venta al arrayList con "add"
-            listadoVentas.add(venta);
-            // Si se ha agregado devolvemos un true y así salimos del bucle también
-            logger.info("Venta añadida");
-            return true;
-        } else {
-            // Si no se ha añadido correctamente devolvemos "false"
+    public boolean addVenta(Connection conexion, Venta venta) {
+        if(venta == null) {
             logger.info("Venta no añadida");
             return false;
         }
+        // Preparamos la sentencia SQL para insertar una venta en la base de datos
+        String sql = "INSERT INTO venta (idVenta, fechaHora, idCliente, idVendedor) " +
+                "VALUES (?, ?, ?, ?)";
+        try {
+            // Creamos un PreparedStatement a partir de la sentencia SQL
+            PreparedStatement statement = conexion.prepareStatement(sql);
+            // Asignamos los valores de la venta a los parámetros de la sentencia SQL
+            statement.setInt(1, venta.getId());
+            statement.setTimestamp(2, Timestamp.valueOf(venta.getFechaHora()));
+            statement.setInt(3, venta.getCliente().getId());
+            statement.setInt(4, venta.getVendedor().getId());
+            // Ejecutamos la sentencia SQL mediante "executeUpdate" ya que estamos añadiendo
+            // un nuevo registro, si modificamos o eliminamos usaremos el mismo
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            logger.info(e.getMessage());
+        }
+        logger.info("Venta añadida");
+        return true;
     }
     // Buscar Venta
-    /**
-     * Método para buscar una venta en el listado de ventas de la persona.
-     * @param venta venta que se va a buscar en el listado.
-     * @return El índice de la venta en el listado si se encuentra, -1 si no se encuentra,
-     * -2 si el parámetro no es válido.
-     */
-    public Venta buscarVenta(Venta venta) {
-        // En primer lugar ordenamos el arrayList haciendo uso del método "sort", pero de la interfaz
-        // colection en este caso, ya que no es un array normal
-        Collections.sort(listadoVentas);
-        // Evaluamos que sea una instancia de "Factura" y que no sea un valor nulo
-        if(venta!=null) {
-            // Creamos un iterador para recorrer el arrayList
-            // CRITERIO: Se han utilizado iteradores para recorrer los elementos de las listas (10%).
-            Iterator<Venta> it = listadoVentas.iterator();
-            // Utilizamos el objeto de iterator que hemos creado, para hacer uso de su método
-            // "hasnext" y comprobar si existe un elemento siguiente
-            // Como dicho método nos devulve un valor boolean, lo usaremos como condición del bucle
-            while (it.hasNext()) {
-                // En caso de existir, nos devuelve true, y acontinuación haciendo uso del método "next()"
-                // accedemos a dicho elemento y aprovechando que tenemos implementado en "Venta" la interfaz
-                // comparable, evaluamos si el valor devuelto por dicho mé
-                if (it.next().compareTo(venta) == 0) {
-                    logger.info("Venta encontrada");
-                    return venta;
-                }
+    public String buscarVenta(Connection conexion, Venta ventaBuscar) {
+        // Preparamos la sentencia SQL para buscar una venta en la base de datos
+        String sql = "SELECT * FROM venta WHERE idVenta = ?";
+        try {
+            // Creamos un PreparedStatement a partir de la sentencia SQL
+            PreparedStatement statement = conexion.prepareStatement(sql);
+            // Asignamos el valor del id a los parámetros de la sentencia SQL
+            statement.setInt(1, ventaBuscar.getId());
+            // Ejecutamos la sentencia y guardamos el resultado en un objeto de ResultSet
+            // Como es una consulta SELECT, lo ejecutamos con executeQuery, ya que no vamos
+            // a modificar ningún registro
+            ResultSet rs = statement.executeQuery();
+            // Si encontramos una venta, la devolvemos
+            // Recorremos los registros de la consulta, pero como estamos filtrando por el
+            // ID, solo aparecerá un unico registro, por lo que el bucle solo se ejecuta
+            // 1 vez. Hacemos uno del método "next" el cual actúa como un Iterador,
+            // y nos devuelve true siempre que haya un elemento
+            while(rs.next()) {
+                String resultadoString = "Venta encontrada: \nID: " + rs.getInt("idVenta")
+                        + "\nfechaHora: " + rs.getTimestamp("fechaHora")
+                        + "\nidCliente: " + rs.getInt("idCliente")
+                        + "\nidVendedor: " + rs.getInt("idVendedor");
+                logger.info("Venta encontrada");
+                return resultadoString;
             }
-            // En caso de recorrer el arrayList y no encontrar coincidencia
-            // devolvemos "null"
-            return null;
-        } else {
-            // En caso de que el objeto pasado sea nulo, devolvemos "null"
-            return null;
+        } catch (SQLException e) {
+            logger.info(e.getMessage());
         }
-
+        // Si no hemos encontrado la factura devolvemos Null
+        return null;
     }
     // Eliminar Venta
-    /**
-     * Método para eliminar una venta del listado de ventas de la persona.
-     * @param venta venta que se va a eliminar.
-     * @return true si la venta se ha eliminado correctamente, false en caso contrario.
-     */
-    public boolean eliminarVenta(Venta venta) {
-        // Evaluamos la nulidad del objeto pasado
-        if(venta!=null) {
-            // Si no es nulo, llamamos al método "remove", que verifica si dicho objeto existe en el arrayLIst,
-            // y en caso afirmativo lo elimina
-            // Como el método nos devuelve un booleano, lo aprovechamos y lo devolvemos
-            return listadoVentas.remove(venta);
-        } else {
-            // En caso de ser nulo, devolvemos un valor "false"
-            return false;
+    public boolean eliminarVenta(Connection conexion, Venta venta) {
+        // Preparamos la sentencia SQL para eliminar una venta de la base de datos
+        String sql = "DELETE FROM venta WHERE idVenta = ?";
+        try {
+            // Creamos un PreparedStatement a partir de la sentencia SQL
+            PreparedStatement statement = conexion.prepareStatement(sql);
+            // Asignamos el valor del id a los parámetros de la sentencia SQL
+            statement.setInt(1, venta.getId());
+            // Ejecutamos la sentencia SQL
+            statement.executeUpdate();
+            logger.info("Venta eliminada");
+            return true;
+        } catch (SQLException e) {
+            logger.info(e.getMessage());
         }
+        return false;
     }
-
-
     // Editar venta
-    /**
-     * Método para modificar una venta en el listado de ventas de la persona.
-     * @param ventaBuscar venta que se va a buscar y modificar.
-     * @param ventaNueva la venta nueva que va reemplazará a la venta antigua.
-     * @return true si la venta se ha modificado correctamente, false en caso contrario.
-     */
-    public boolean modificarVenta(Venta ventaBuscar, Venta ventaNueva) {
-        // Evaluamos que los dos objetos no sean nulos
-        if((ventaBuscar != null) && (ventaNueva != null)) {
-            // Llamamos al método "indexOf" para averiguar la posición del elemento que buscamos en el ArrayList
-            int posicion = listadoVentas.indexOf(ventaBuscar);
-            // Aprovechando que "indexOf", nos devulve un -1 en caso de no encontrar el objeto en el ArrayList
-            // y evaluamos que la posición sea mayor o igual a 0
-            if(posicion>=0) {
-                // En primer lugar, le asignamos al nuevo objeto, el id del viejo
-                ventaNueva.setId(listadoVentas.get(posicion).getId());
-                // Asignamos el nuevo Objeto, en la posición del antiguo
-                listadoVentas.set(posicion, ventaNueva);
-                // Si se ha modificado el objeto correctamente, devolvemos un true
-                return true;
-            } else {
-                // Si no se encuentra devolvemos "false"
-                return false;
-            }
-        } else {
-            // En caso de haber alguno nulo, devolvemos "false
+    public boolean modificarVenta(Connection conexion, Venta ventaNueva, Venta ventaBuscar) {
+        if(ventaNueva == null || ventaBuscar == null) {
+            logger.info("Uno de los objetos de venta es nulo.");
             return false;
         }
-
+        // Preparamos la sentencia SQL para modificar una venta en la base de datos
+        String sql = "UPDATE venta SET fechaHora = ?, idCliente = ?, idVendedor = ? WHERE idVenta = ?";
+        try {
+            // Creamos un PreparedStatement a partir de la sentencia SQL
+            PreparedStatement statement = conexion.prepareStatement(sql);
+            // Asignamos los valores de la venta a los parámetros de la sentencia SQL
+            statement.setTimestamp(1, Timestamp.valueOf(ventaNueva.getFechaHora()));
+            statement.setInt(2, ventaNueva.getCliente().getId());
+            statement.setInt(3, ventaNueva.getVendedor().getId());
+            // Como el id que es el campo por el cual buscamos, lo vamos a dejar igual,
+            // recurrimos a extraer el id del objeto venta antiguo
+            statement.setInt(4, ventaBuscar.getId());
+            // Ejecutamos la sentencia SQL
+            statement.executeUpdate();
+            logger.info("Venta modificada");
+            return true;
+        } catch (SQLException e) {
+            logger.info(e.getMessage());
+        }
+        // Si ha llegado aquí significa que ha saltado el error, por lo tanto no se ha
+        // modificado la venta, así que devolvemos "false"
+        return false;
     }
 
 
@@ -395,39 +350,7 @@ public abstract class Persona {
     public String getNif() {
         return nif;
     }
-    // Listado Ventas
-    public ArrayList<Venta> getListadoVentas() {
-        return listadoVentas;
-    }
-    /**
-     * Este método setter nos sirve para cambiar el listado de las ventas de la persona,
-     * además se asegura que el listado pasado sea del mismo tamaño que el anterior para
-     * evitar errores.
-     * @param listadoVentas el nuevo listado de ventas.
-     * @return true si el listado de ventas se ha establecido correctamente, false en caso contrario.
-     */
-    public void setListadoVentas(ArrayList<Venta> listadoVentas) {
-        this.listadoVentas = listadoVentas;
-    }
-    // Listado Facturas
-    public Factura[] getListadoFacturas() {
-        return listadoFacturas;
-    }
-    /**
-     * Este método setter nos sirve para cambiar el listado de las facturas de la persona,
-     * además se asegura que el listado pasado sea del mismo tamaño que el anterior para
-     * evitar errores.
-     * @param listadoFacturas el nuevo listado de facturas.
-     * @return true si el listado de facturas se ha establecido correctamente, false en caso contrario.
-     */
-    public boolean setListadoFacturas(Factura[] listadoFacturas) {
-        // Nos aseguramos de que ambos arrays tengan el mismo tamaño
-        if(listadoFacturas.length==getListadoFacturas().length) {
-            this.listadoFacturas = listadoFacturas;
-            // Devolvemos true si se a reasignado correctamente
-            return true;
-        } else return false;
-    }
+
     // Edad
     public int getEdad() {
         return edad;

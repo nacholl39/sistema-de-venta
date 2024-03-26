@@ -2,9 +2,6 @@ package persona;
 
 import java.time.LocalDate;
 
-import venta.Factura;
-import venta.Venta;
-
 /**
  * La clase Vendedor hereda de  "Persona" y representa a un vendedor en el sistema.
  * @author Mlm96
@@ -52,7 +49,7 @@ public final class Vendedor extends Persona{
 
     // GETTERS Y SETTERS
     // Codigo Cliente
-    public int getNumeroVendedor() {
+    public int getId() {
         return numeroVendedor;
     }
 

@@ -1,6 +1,7 @@
 package venta;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 import persona.Cliente;
@@ -11,11 +12,11 @@ import persona.Vendedor;
  * @author Mlm96
  * @version 1.0
  */
-public class Venta implements Comparable{
+public class Venta implements Comparable {
     // Declaramos los atributos
     private static int contador; // Contador estático para generar identifircadores únicos
     private int id; // Identificador único de cada venta
-    private LocalDate fecha; // Fecha en la que se realiza la venta
+    private LocalDateTime fechaHora; // Fecha y hora en la que se realiza la venta
     private Cliente cliente; // Cliente al que se realizó la venta
     private Vendedor vendedor; // Vendedor que realizó la venta
     private Factura factura; // Factura relacionada con la propia venta
@@ -26,14 +27,13 @@ public class Venta implements Comparable{
     // Bloque de inicialización de instancia. En él, asignamos el identificador y la fecha actual.
     {
         id = contador++;
-        fecha = LocalDate.now();
+        fechaHora = LocalDateTime.now();
     }
     // Constructor
     public Venta( Cliente cliente, Vendedor vendedor) {
         this.cliente = cliente;
         this.vendedor = vendedor;
     }
-
 
     // Métodos y funcionalidades
     //Interfaz comparable
@@ -47,9 +47,9 @@ public class Venta implements Comparable{
     @Override
     public int compareTo(Object objeto) {
         // Evaluamos si el objeto esta a "null"
-        if(objeto!=null) throw new IllegalArgumentException("El parámetro no puede ser nulo");
+        if(objeto==null) throw new IllegalArgumentException("El parámetro no puede ser nulo");
         // Evaluamos si el objeto es una instancia de "Venta"
-        if(objeto instanceof Venta) throw new IllegalArgumentException("El parámetro debe ser del tipo Empleado");
+        if(!(objeto instanceof Venta)) throw new IllegalArgumentException("El parámetro debe ser del tipo Venta");
         // Comparamos si la factura pasada es mayor(1), menor(-1) o son iguales (0)
         if(((Venta)objeto).getId()==this.getId()) {
             // Si son iguales devolvemos un 0
@@ -76,8 +76,8 @@ public class Venta implements Comparable{
     public void setFactura(Factura factura) {
         this.factura = factura;
     }
-    public LocalDate getFecha() {
-        return fecha;
+    public LocalDateTime getFechaHora() {
+        return fechaHora;
     }
     public Cliente getCliente() {
         return cliente;
@@ -86,4 +86,14 @@ public class Venta implements Comparable{
         return vendedor;
     }
 
+    @Override
+    public String toString() {
+        return "Venta{" +
+                "id=" + id +
+                ", fecha=" + fechaHora +
+                ", cliente=" + cliente +
+                ", vendedor=" + vendedor +
+                ", factura=" + factura +
+                '}';
+    }
 }

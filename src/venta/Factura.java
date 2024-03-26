@@ -1,7 +1,14 @@
 package venta;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.logging.Logger;
+
+import logger.MyLogger;
 
 
 import persona.Cliente;
@@ -27,8 +34,11 @@ public class Factura implements Comparable {
     private DetalleFactura[] detallesFactura; // Array de objetos de la clase detalle factura
     private float importeTotalSinImpuestos, importeTotalConImpuestos,
             impuestos; // Importes de nuestra factura
+    protected static Logger logger;
     // Bloque de inicialización estático
     static {
+        // Inicializamos el logger estático para que nos sirva para la clase en general
+        logger = MyLogger.getLogger("A");
         contador = 0;
     }
     // Bloque de inicialización de instancia
@@ -99,7 +109,7 @@ public class Factura implements Comparable {
         // Evaluamos si el objeto esta a "null"
         if(objeto==null) throw new IllegalArgumentException("El parámetro no puede ser nulo");
         // Evaluamos si el objeto es una instancia de "Factura"
-        if(!(objeto instanceof Factura)) throw new IllegalArgumentException("El parámetro debe ser del tipo Empleado");
+        if(!(objeto instanceof Factura)) throw new IllegalArgumentException("El parámetro debe ser del tipo Factura");
         // Comparamos si la factura pasada es mayor(1), menor(-1) o son iguales (0)
         if(((Factura)objeto).getId()==this.getId()) {
             // Si son iguales devolvemos un 0
@@ -119,122 +129,116 @@ public class Factura implements Comparable {
      * @param detalleFactura deltalle de factura que va a ser añadida.
      * @return true si la factura se ha añadido correctamente, false en caso contrario.
      */
-    public boolean addDetalleFactura(DetalleFactura detalleFactura) {
-        // Inicializamos un constador para recorrer el listado de DetalleFactura
-        int contador=0;
-        // Evaluamos que sea una instancia de "DetalleFactura" y que no sea un valor nulo
-        if((detalleFactura instanceof DetalleFactura) && (detalleFactura!=null)) {
-            // Recorremos el listado de DetallesFactura, y añadimos el DetalleFactura donde el valor sea Null
-            // es decir, donde este vacío. Como no sabemos cuando será, usamos do,while
-            do {
-                if(detallesFactura[contador] == null) {
-                    // Añadimos la factura al array
-                    detallesFactura[contador] = detalleFactura;
-                    // Si se ha agregado devolvemos un true y así salimos del bucle también
-                    return true;
-                }
-                // Incrementamos el contador
-                contador++;
-                // Evaluamos en la condición que contador no supere al tamaño del array
-            } while((contador<detallesFactura.length));
+    public boolean addDetalleFactura(Connection conexion, DetalleFactura detalleFactura) {
+        if(detalleFactura == null) {
+            logger.info("Detalle Factura no añadido");
+            return false;
         }
-        // Si no se ha añadido correctamente devolvemos "false"
-        return false;
+        // Preparamos la sentencia SQL para insertar una venta en la base de datos
+        String sql = "INSERT INTO detalleFactura (idDetalle, lineaFactura, cantidad, idFactura, referenciaProducto) " +
+                "VALUES (?, ?, ?, ?, ?)";
+        try {
+            // Creamos un PreparedStatement a partir de la sentencia SQL
+            PreparedStatement statement = conexion.prepareStatement(sql);
+            // Asignamos los valores de la venta a los parámetros de la sentencia SQL
+            statement.setInt(1, detalleFactura.getId());
+            statement.setInt(2, detalleFactura.getLineaFactura());
+            statement.setInt(3, detalleFactura.getCantidad());
+            statement.setInt(4, detalleFactura.getFactura().getId());
+            statement.setString(5, detalleFactura.getProducto().getReferencia());
+            // Ejecutamos la sentencia SQL
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            logger.info(e.getMessage());
+        }
+        logger.info("Detalle Factura no añadido");
+        return true;
     }
     // Buscar DetalleFactura
-    /**
-     * Método para buscar un detalle factura en el listado de detalles facturas de
-     * la factura.
-     * @param detalleFactura detalleFactura que se va a buscar en el listado
-     * @return El índice de la factura en el listado si se encuentra, -1 si no se encuentra,
-     * -2 si el parámetro no es válido.
-     */
-    public int buscarDetalleFactura(DetalleFactura detalleFactura) {
-        // Inicializamos un contador para recorrer el array
-        int contador=0;
-        // Evaluamos que sea una instancia de "Factura" y que no sea un valor nulo
-        if((detalleFactura instanceof DetalleFactura) && (detalleFactura!=null)) {
-            // Recorremos el array de Facturas, como no sabemos cuando encontraremos la factura
-            // emplearemos un bucle do,while
-            do {
-                // Usamos la interfaz comparable de "Factura" para evaluar si son iguales
-                if(detallesFactura[contador].compareTo(detalleFactura) == 0) {
-                    // Salimos del bucle si se ha cumplido la condición
-                    // Con eso conseguimos que contador se quede con el valor de la posición
-                    return contador;
-                }
-                // Incrementamos el contador
-                contador++;
-                // Evaluamos que contador no supere el tamaño del array
-            } while((contador<detallesFactura.length));
-            // Retornamos el valor -1 si no se ha encontrado ninguna
-            return -1;
+    public String buscarDetalleFactura(Connection conexion, DetalleFactura detalleFactura) {
+        // Comprobamos la nulidad
+        if(detalleFactura == null) {
+            logger.info("Objeto detalleFactura nulo");
+            return null;
         }
-        // Devolvemos un -2 en caso de que el parámetro no sea válido (nulo o de otro tipo)
-        else return -2;
+        // Preparamos la sentencia SQL para buscar una venta en la base de datos
+        String sql = "SELECT * FROM detalleFactura WHERE idDetalle = ?";
+        try {
+            // Creamos un PreparedStatement a partir de la sentencia SQL
+            PreparedStatement statement = conexion.prepareStatement(sql);
+            // Asignamos el valor del id a los parámetros de la sentencia SQL
+            statement.setInt(1, detalleFactura.getId());
+            // Ejecutamos la sentencia SQL y obtenemos los resultados
+            ResultSet rs = statement.executeQuery();
+            // Si encontramos una venta, la devolvemos
+            // Recorremos los registros de la consulta, pero como estamos filtrando
+            while(rs.next()) {
+                String resultadoString = "DetalleFactura encontrado: \nID: " + rs.getInt("idDetalle")
+                        + "\nlineaFactura: " + rs.getInt("lineaFactura")
+                        + "\ncantidad: " + rs.getInt("cantidad")
+                        + "\nidFactura: " + rs.getInt("idFactura"
+                        + "\nreferenciaProducto: " + rs.getString("referenciaProducto"));
+                logger.info("DetalleFactura encontrado");
+                return resultadoString;
+            }
+        } catch (SQLException e) {
+            logger.info(e.getMessage());
+        }
+        // Si no hemos encontrado la factura devolvemos Null
+        return null;
     }
     // Eliminar DetalleFactura
-    /**
-     * Método para eliminar un detalle del listado de detalles de la factura.
-     * @param detalleFactura detalleFactura que se va a eliminar
-     * @return true si la factura se ha eliminado correctamente, false en caso contrario.
-     */
-    public boolean eliminarDetalleFactura(DetalleFactura detalleFactura) {
-        // Llamamos al método "buscarDetalleFactura" para encontrar la posición del elemento a
-        // eliminar y le asignamos el valor a una variable
-        int posicion = buscarDetalleFactura(detalleFactura);
-        // Inicializamos un nuevo array de Ventas
-        DetalleFactura[] nuevoDetallesFactura = new DetalleFactura[10];
-        // Evaluamos que la posición devuelta sea mayor o igual a 0, ya que en caso contrario
-        // significa que el objeto venta es nulo, de otro tipo o no se ha encontrado
-        if(posicion>=0) {
-            // Inicializamos un contador para recorrer el array nuevo
-            int contador=0;
-            // Recorremos el array de Ventas y la guardamos mientras no coincida, en el nuevo array
-            // asi obtenemos un nuevo array usamos un bucle for porque debemos recorrerlo entero
-            for(int i=0; i<detallesFactura.length; i++) {
-                // Si no coincide la variable iteradora con la posición que deseamos eliminar,
-                // la almacenamos e incrementamos el contador de posiciones del nuevo
-                // array, en caso contrario no, así conseguimos que no se quede el hueco
-                // de la posición que hemos eliminado en el nuevo listado
-                if(i!=posicion) {
-                    nuevoDetallesFactura[contador] = detallesFactura[i];
-                    // Incrementamos el contador
-                    contador++;
-                }
-            }
-            // Reasignamos al listado de facturas el nuevo listado
-            setDetallesFactura(nuevoDetallesFactura);
-            // Devolvemos un true para verificar que se ha hecho correctamente
-            return true;
+    public boolean eliminarDetalleFactura(Connection conexion, DetalleFactura detalleFactura) {
+        // Comprobamos la nulidad
+        if(detalleFactura == null) {
+            logger.info("Objeto detalleFactura nulo");
+            return false;
         }
-        // Devolvemos false, en caso de que no se haya eliminado ningun elemento y siga igual
+        // Preparamos la sentencia para eliminarlo
+        String sql = "DELETE FROM detalleFactura WHERE idDetalle = ?";
+        try {
+            // Creamos el PreparedStatement a partir de la sentencia creada
+            PreparedStatement statement = conexion.prepareStatement(sql);
+            // Asignamos el valor del id al campo de la consulta "?"
+            statement.setInt(1, detalleFactura.getId());
+            // Ejecutamos la sentencia
+            statement.executeUpdate();
+            logger.info("Detalle Factura eliminada");
+            return true;
+        } catch (SQLException e) {
+            logger.info(e.getMessage());
+        }
         return false;
     }
+
+
     // Editar DetalleFactura
-    /**
-     * Método para modificar un DetalleFactura en el listado de DetalleFactura de la factura.
-     * @param detalleFacturaBuscar DetalleFactura que se va a buscar y modificar.
-     * @param detalleFacturaNueva el DetalleFactura nuevo que va reemplazará a el DetalleFactura antiguo.
-     * @return true si la factura se ha modificado correctamente, false en caso contrario.
-     */
-    public boolean modificarDetalleFactura(DetalleFactura detalleFacturaBuscar,
-                                           DetalleFactura detalleFacturaNueva) {
-        // Llamamos al método buscar DetalleFactura para localizar la venta a modificar
-        // y guardamos la posición en una variable
-        int posicion = buscarDetalleFactura(detalleFacturaBuscar);
-        // Evaluamos que la posición devuelta sea mayor o igual a 0, ya que en caso contrario
-        // significa que el objeto DetalleFacturaNueva es nulo, de otro tipo o no se ha encontrado
-        if(posicion>=0) {
-            // Se lo asignamos a la factura nueva el identificador de la antigua
-            detalleFacturaNueva.setId(detallesFactura[posicion].getId());
-            // Le asignamos al objeto de factura en esa posición, los nuevos valores, que
-            // son los del objeto "facturaNueva"
-            detallesFactura[posicion] = detalleFacturaNueva;
-            // Devolvemos un true para verificar que se ha hecho correctamente
-            return true;
+    public boolean modificarDetalleFactura(Connection conexion, DetalleFactura detalleFactura) {
+        // Primero comprobamos la nulidad del objeto
+        if(detalleFactura == null) {
+            logger.info("Objeto detalleFactura nulo");
+            return false;
         }
-        // Devolvemos false, en caso de que no se haya modficado ningun elemento y siga igual
+        // Preparamos la sentencia SQL para realizar un UPDATE
+        String sql = "UPDATE detalleFactura SET lineaFactura = ?, cantidad = ?, " +
+                "idFactura = ?, referenciaProducto = ? WHERE idDetalle = ?";
+        try {
+            // Creamos un objeto de PreparedStatement y le pasamos la consulta
+            PreparedStatement statement = conexion.prepareStatement(sql);
+            // Asignamos los valores a los campos de la consulta
+            statement.setInt(1, detalleFactura.getLineaFactura());
+            statement.setInt(2, detalleFactura.getCantidad());
+            statement.setInt(3, detalleFactura.getFactura().getId());
+            statement.setString(4, detalleFactura.getProducto().getReferencia());
+            statement.setInt(5, detalleFactura.getId());
+            // Ejecutamos la consulta
+            statement.executeUpdate();
+            logger.info("DetalleFactura Modificado");
+            return true;
+        } catch (SQLException e) {
+            logger.info(e.getMessage());
+        }
+        // Si hemos llegado aquí significa que ha ocurrido una exepción y no se ha modificado
         return false;
     }
 
@@ -273,4 +277,19 @@ public class Factura implements Comparable {
         return fechaHora;
     }
 
+    @Override
+    public String toString() {
+        return "Factura{" +
+                "id=" + id +
+                ", fechaHora=" + fechaHora +
+                ", fechaHoraFormateada='" + fechaHoraFormateada + '\'' +
+                ", cliente=" + cliente +
+                ", vendedor=" + vendedor +
+                ", venta=" + venta +
+                ", detallesFactura=" + Arrays.toString(detallesFactura) +
+                ", importeTotalSinImpuestos=" + importeTotalSinImpuestos +
+                ", importeTotalConImpuestos=" + importeTotalConImpuestos +
+                ", impuestos=" + impuestos +
+                '}';
+    }
 }

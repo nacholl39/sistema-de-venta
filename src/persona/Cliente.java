@@ -1,13 +1,6 @@
 package persona;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-
-import venta.Factura;
-import venta.Venta;
-
-import venta.Factura;
-import venta.Venta;
 
 /**
  * La clase Cliente hereda de "Persona" y representa a un cliente en el sistema.
@@ -59,7 +52,7 @@ public final class Cliente extends Persona {
 
     // GETTERS Y SETTERS
     // Codigo Cliente
-    public int getCodigoCliente() {
+    public int getId() {
         return codigoCliente;
     }
 
