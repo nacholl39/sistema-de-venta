@@ -226,6 +226,7 @@ public class Test {
         // -------------------------------------------
 
         // AÑADIR
+        System.out.println("\n----------------VAMOS A AÑADIR LA FACTURA Y LA VENTA------------------\n");
         // CLIENTE
         System.out.println("Vamos a añadir la factura al cliente.");
         // Aprovehcamos que nos devuleve un "boolean" para ver si se ha añadido correctamente.
@@ -248,12 +249,13 @@ public class Test {
             System.out.println("La Venta se ha añadido correctamente al Vendedor");
         } else System.out.println("La Venta no se ha añadido correctamente al Vendedor");
 
+        System.out.println("\n----------------BUSCAR VENTA------------------\n"); // Separador
 
         // --------------------------------
         // BUSCAR (VENTAS) (con este método además de verificar su funcionamiento, comprobamos que se haya añadido
         // CLIENTE
         // Llamamos al método y le pasamos el objeto de Venta en caso de encontrarlo nos lo devuelve y lo mostramos
-        System.out.println("\nVamos a buscar la venta en los arrayList (listados) de CLiente y Vendedor.");
+        System.out.println("Vamos a buscar la venta en los arrayList (listados) de CLiente y Vendedor.");
         System.out.println("Se ha encontrado la venta: " + cliente.buscarVenta(venta)
                 + " en el arrayList de Cliente."); // En caso de no añadirse nos devuelve "null"
         // VENDEDOR
@@ -262,6 +264,7 @@ public class Test {
         System.out.println("Se ha encontrado la venta: " + vendedor.buscarVenta(venta)
                 + " en el arrayList de Vendedor."); // En caso de no añadirse nos devuelve "null"
 
+        System.out.println("\n------------Vamos a MODIFICAR LA VENTA. Y a BUSCARLA----------------\n"); // Separador
 
         // --------------------------------
         // EDITAR (creamos un nuevo objeto y se lo pasamos para que sustituya el anterior por este)
@@ -295,7 +298,7 @@ public class Test {
         System.out.println();
         // --------------------------------
 
-        System.out.println("Ahora vamos a eliminar la venta.");
+        System.out.println("\n------------Ahora vamos a ELIMINAR LA VENTA. Y a BUSCARLA-------------\n");
         // ELIMINAR (eliminamos los objetos de Venta existentes en los listados, y volvemos a llamar a "buscar" para
         // verificar que no se encuentre)
 

@@ -12,7 +12,7 @@ import java.time.format.DateTimeParseException;
  * de la interfaz gráfica y de los controladores de eventos.
  * CRITERIOS: "f", "g" y "h".
  */
-public class VentanaFechaNacVendedor extends JFrame{
+public class VentanaFechaNacVendedor {
     // "fechaNacimiento" lo declaramos como un atributo de la clase, fuera del constructor, ya que si
     // lo hicieramos dentro, no sería accesible desde su método "get" y no podríamos utilizar su valor
     // en el "main"
@@ -27,7 +27,7 @@ public class VentanaFechaNacVendedor extends JFrame{
         // de lo contrario, cuando la cerremos seguira funcionando. En este caso no es
         // necesario, ya que más abajo le indicamos que termine cuando pulsemos el botón
         // de "enviar" y el formato de la fecha sea correcto, pero lo dejaremos de todas formas.
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Inicializamos el panel de la ventana
         JPanel panel = new JPanel();
@@ -38,7 +38,7 @@ public class VentanaFechaNacVendedor extends JFrame{
         panel.setLayout(null);
 
         // Creamos la etiqueta con el texto "Fecha de Nacimiento (yyyy-mm-dd)" para indicar el formato
-        JLabel fechaNacLabel = new JLabel("Fecha de Nacimiento (yyyy-mm-dd)");
+        JLabel fechaNacLabel = new JLabel("Fecha de Nacimiento (dd-MM-yyyy)");
         // Indicamos las coordenadas y el tamaño de la etiqueta con el texto, dentro de la ventana
         fechaNacLabel.setBounds(10, 20, 200, 25);
         // Añade la etiqueta al panel
@@ -71,10 +71,11 @@ public class VentanaFechaNacVendedor extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Cuando se hace clic en el botón, recoge la fecha del campo de texto en el que se
-                // encontrará la fecha introducida
+                // encontrará la fecha introducida, a través de su método "getText" el cual nos
+                // permite hacer esto mismo, obtener el valor introducido en un campo de la ventana.
                 String fecha = campoFecha.getText();
                 // Crea un nuevo formateador de fecha para convertir una cadena en un LocalDate
-                DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd-MM-yyyy");
                 try {
                     // Inicializamos el atributo referente a la fecha de nacimiento, llamando al
                     // método ".parse", y pasandole por parámetro la fecha recogida, y el formato creado
@@ -89,7 +90,7 @@ public class VentanaFechaNacVendedor extends JFrame{
                     }
                 } catch (DateTimeParseException ex) {
                     // Si la fecha no está en el formato correcto, mostramos un mensaje de error
-                    JOptionPane.showMessageDialog(null, "Formato de fecha incorrecto. Por favor, use el formato yyyy-MM-dd.");
+                    JOptionPane.showMessageDialog(null, "Formato de fecha incorrecto. Por favor, use el formato dd-MM-yyyy.");
                 }
             }
         });
