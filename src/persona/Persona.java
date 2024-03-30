@@ -1,5 +1,7 @@
 package persona;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
 
 import logger.MyLogger;
@@ -10,6 +12,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import pruebas.Test;
 import venta.Factura;
 import venta.Venta;
 
@@ -17,47 +20,72 @@ import venta.Venta;
  * Esta clase abstracta hace referencia a una persona dentro del sistema de ventas.
  * Tiene una seria de atributos que representan información sobre la persona, además
  * también lleva un registro de las ventas y facturas asociadas a la propia persona.
+ * Criterios:
+ * Cambios RA5: se ha mantenido el objeto de "logger" para trazar en formato "xml".
+ * También he añadido un objeto de "fileWriter" para trazar en un formato normal los mismos
+ * mensajes, y así usar otra librería interna de trazado. Se ha reconocido la posibilidad de
+ * usar para trazar una instancia de la clase "BufferWriter", en vez de FileWriter, pero
+ * como no lo he visto necesario, he escogido esta última, además de usar la librería del
+ * logger, como en la entrega pasada.
  * @author Mlm96
- * @version 1.0
+ * @version 1.2
  */
 public abstract class Persona {
     // Declaramos los atributos
     protected String nif, nombre, direccion, correo;
     protected int telefono, edad;
     protected LocalDate fechaNac;
-    // CRITERIO: Se han reconocido las librerías de clases relacionadas con tipos de datos avanzados (5%).
-    // CRITERIO: Se han utilizado listas para almacenar y procesar información (15%).
-    // He cambiado el array de ventas, por un arrayList, y he modificado
-    // los métodos relacionados con dicho ArrayList (buscar, add, eliminar y modificar)
-    // por lo que en dichos métodos relacionados con el listado de ventas
-    // también podrás ver el uso de los métodos de los arrayList
-    // para cubrir los criterios
-    /*
-     Se ha reconocido las ventajas de los tipos de las distintas estructuras de datos
-     ya que la idea era utilizar "HashSet" en vez de "ArrayList", debido a que "HashSet"
-     no permite valores duplicados y no debe exister la posibilidad de que haya dos facturas
-     en el mismo listado.
-     Pero debido a que el criterio "c" dice que utilicemos "listas" he optado por usar ArrayList
-     para cumplir con dicho criterio.
-     */
     protected ArrayList<Venta> listadoVentas;
-    // En el caso del listado de Facturas, lo he dejado como un array
-    // normal, para poder hacer uso de los métodos de la clase Arrays
-    // y cumplir con el criterio "a"
-    // Puede verse en el método "buscarFactura" en el hacemos uso de "sort"
-    // para ordenar el array antes de recorrerlo, aprovechando que la
-    // clase "Factura" tiene implementada la interfaz "comparable"
-    protected Factura[] listadoFacturas;
+    protected ArrayList<Factura> listadoFacturas;
+    // En esta entrega dejare el "logger" para trazar tanto por consola, como en un fichero con
+    // formato "xml" y cumplir con varios criterios
+    /*
+     CRITERIO "a": Se ha utilizado la consola para realizar operaciones de entrada y salida de
+     información (15%).
+     Ya que "logger" trazamos también por consola.
+     */
+    /*
+    CRITERIO "b": Se han aplicado formatos en la visualización de la información (10%).
+    El "logger" traza en el fichero en formato "xml". Se puede ver en el archivo "java.log"
+     */
+    /*
+    CRITERIO "c": Se han reconocido las posibilidades de entrada/salida del lenguaje y las
+    librerías asociadas (10%).
+    Ya que trazamos con "logger" aquí, y con "FileWriter"
+     */
+    /*
+    CRITERIO "d": Se han utilizado ficheros para almacenar y recuperar información (10%).
+    Ya que trazamos en el fichero "java.log"
+     */
     protected static Logger logger;
+    /*
+    CRITERIO "c": Se han reconocido las posibilidades de entrada/salida del lenguaje y las librerías asociadas (10%).
+     */
+    /*
+    CRITERIO "d": Se han utilizado ficheros para almacenar y recuperar información (10%).
+    Ya que trazamos en el fichero "mensajes_metodos.txt"
+     */
+    // Le voy a añadir otro atributo que nos servirá para trazar mensajes en otro fichero, será
+    // una instancia de la clase "FileWriter", pense en hacerlo de "BufferWriter", como en el caso
+    // de los métodos de la clase "Copy" del proyecto, pero en este caso no lo veía necesario.
+    //protected static FileWriter fileWriter;
     // Bloque estático
     static {
         // Inicializamos el logger estático para que nos sirva para la clase en general
         logger = MyLogger.getLogger("A");
+        // Inicializamos el objeto de "FileWriter" y lo envolvemos en un "try/catch" ya que el
+        // IDE nos obliga al ser una posible exepción de tipo comprobada.
+        /*try {
+            // Le pasamos a la instancia el nombre del fichero en el que queremos que escriba.
+            fileWriter = new FileWriter("mensajes_metodos.txt");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }*/
     }
     // Bloque inicialización
     {
         listadoVentas = new ArrayList<>();
-        listadoFacturas = new Factura[10];
+        listadoFacturas = new ArrayList<>();
     }
     /**
      * Este constructor inicializa una instancia de la clase "Persona" con los datos
@@ -110,13 +138,43 @@ public abstract class Persona {
 
     // Métodos y funcionalidades
     // Método genérico, que implementamos de la interfaz Listable
-
     // Mostrar informacion (método abstracto)
     /**
      * Método abstracto para mostrar la información relacionada con la persona.
      * Al ser abstracta será sobreescrita por las clases hijas.
      */
     public abstract void mostrarInformacion();
+
+    /**
+     * Método para validar la nulidad de la Factura
+     * @param factura
+     * @return
+     */
+    public static boolean facturaIsNull(Factura factura) {
+        // Validamos si la factura es "nula", en cuyo caso, trazamos el mensaje, y devolvemos "true"
+        if(factura == null) {
+            try {
+                // Creamos un objeto de "fileWriter" para trazar el mensaje, y le pasamos como segundo parámetro
+                // "true" para que no sobreescriba el archivo, sino que lo añada al final
+                FileWriter fileWriter = new FileWriter(Test.NOMBRE_ARCHIVO, true);
+                // Trazamos con el objeto de "fileWriter" de la clase en el archivo "mensaje_metodos.txt"
+                // TRAZAMOS CON "FILEWRITER"
+                fileWriter.write("Objeto de Factura Nulo");
+                // Cerramos "fileWriter"
+                fileWriter.close();
+                // TRAZAMOS CON "LOGGER"
+                // Trazamos por consola y en el archivo "java.log" con el "logger.info"
+                logger.info("Objeto de Factura Nulo");
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+            // Devolvemos "true" para indicar que la factura es "nula"
+            return true;
+        }
+
+        // Devolvemos "false" para indicar que el objeto no es "nulo"
+        return false;
+    }
     // FACTURA
     // Añadir Factura
     /**
@@ -125,29 +183,33 @@ public abstract class Persona {
      * @return true si la factura se ha añadido correctamente, false en caso contrario.
      */
     public boolean addFactura(Factura factura) {
-        // Inicializamos un constador para recorrer el listado de Facturas
-        int contador=0;
-        // Evaluamos que sea una instancia de "Factura" y que no sea un valor nulo
-        if(factura!=null) {
-            // Recorremos el listado de facturas, y añadimos la factura donde el valor sea Null
-            // es decir, donde este vacío. Como no sabemos cuando será, usamos do,while
-            do {
-                if(listadoFacturas[contador] == null) {
-                    // Añadimos la factura al array
-                    listadoFacturas[contador] = factura;
-                    // Trazamos que se ha añadido
-                    logger.info("Factura añadida correctamente");
-                    // Si se ha agregado devolvemos un true y así salimos del bucle también
-                    return true;
-                }
-                // Incrementamos el contador
-                contador++;
-                // Evaluamos en la condición que contador no supere al tamaño del array
-            } while((contador<listadoFacturas.length));
+        try {
+            // Evaluamos la nulidad
+            // Llamamos al método "facturaIsNull" para comprobar si la factura es nula
+            if(Persona.facturaIsNull(factura)) {
+                // Devolvemos "false" en caso de que sea "nula" para indicar al programamdor que no se ha
+                // añadido la factura al "listadoFactura"
+                return false;
+            }
+
+            // Creamos un objeto de "fileWriter" para trazar el mensaje, y le pasamos como segundo parámetro
+            // "true" para que no sobreescriba el archivo, sino que lo añada al final
+            FileWriter fileWriter = new FileWriter(Test.NOMBRE_ARCHIVO, true);
+
+            // En caso de no ser nulo, añadimos la factura al arrayList con "add"
+            listadoFacturas.add(factura);
+            // TRAZAMOS CON "FILEWRITER"
+            fileWriter.write("Factura añadida.");
+            // Cerramos "fileWriter"
+            fileWriter.close();
+            // TRAZAMOS CON "LOGGER"
+            // Si se ha agregado devolvemos un true y así salimos del bucle también
+            logger.info("Factura añadida");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-        // Si no se ha añadido correctamente devolvemos "false" y trazamos el mensaje
-        logger.info("Factura no añadida correctamente");
-        return false;
+        // Devolvemos "true" para indicar que la Factura se ha añadido al listado
+        return true;
     }
     // Buscar Factura
     /**
@@ -156,38 +218,48 @@ public abstract class Persona {
      * @return El índice de la factura en el listado si se encuentra, -1 si no se encuentra,
      * -2 si el parámetro no es válido.
      */
-    public int buscarFactura(Factura factura) {
-        // CRITERIO: Se han escrito programas que utilicen arrays (15%)
-        // Ordenamos el array con el método "sort"
-        Arrays.sort(listadoFacturas);
-        // Inicializamos un contador para recorrer el array
-        int contador=0;
-        // Evaluamos que sea una instancia de "Factura" y que no sea un valor nulo
-        if(factura!=null) {
-            // Recorremos el array de Facturas, como no sabemos cuando encontraremos la factura
-            // emplearemos un bucle do,while
-            do {
-                // Usamos la interfaz comparable de "Factura" para evaluar si son iguales
-                if(listadoFacturas[contador].compareTo(factura) == 0) {
-                    // Salimos del bucle si se ha cumplido la condición
-                    // Con eso conseguimos que contador se quede con el valor de la posición
-                    logger.info("Factura encontrada en posición: " + contador);
-                    return contador;
-                }
-                // Incrementamos el contador
-                contador++;
-                // La condición es que el contador siga siendo menor a la longitud, para evitar un fuera
-                // de índice; además de que "facturaBuscada" debe seguir a null, ya que si se ha encontrado
-                // no debemos seguir buscando
-            } while((contador<listadoFacturas.length));
-            // Retornamos el valor -1 si no se ha encontrado ninguna
-            logger.info("Factura no encontrada");
-            return -1;
-        } else {
-            // Devolvemos un -2 en caso de que el parámetro no sea válido (nulo o de otro tipo)
-            logger.info("Factura no válida");
-            return -2;
+    public Factura buscarFactura(Factura factura) {
+        // Validamos si la factura es nula
+        if(Persona.facturaIsNull(factura)) {
+            // Devolvemos "null" en caso de que sea "nula" para indicar al programamdor que no se ha
+            // añadido la factura al "listadoFactura"
+            return null;
         }
+
+        // Creamos una instancia de FileWriter para trazar el mensaje en el archivo
+        try {
+            // Creamos un objeto de "fileWriter" para trazar el mensaje, y le pasamos como segundo parámetro
+            // "true" para que no sobreescriba el archivo, sino que lo añada al final
+            FileWriter fileWriter = new FileWriter(Test.NOMBRE_ARCHIVO, true);
+            // Creamos un iterador para recorrer el arrayList
+            // CRITERIO: Se han utilizado iteradores para recorrer los elementos de las listas (10%).
+            Iterator<Factura> it = listadoFacturas.iterator();
+            // Utilizamos el objeto de iterator que hemos creado, para hacer uso de su método
+            // "hasnext" y comprobar si existe un elemento siguiente
+            // Como dicho método nos devulve un valor boolean, lo usaremos como condición del bucle
+            while (it.hasNext()) {
+                // En caso de existir, nos devuelve true, y acontinuación haciendo uso del método "next()"
+                // accedemos a dicho elemento y aprovechando que tenemos implementado en "Venta" la interfaz
+                // comparable, evaluamos si el valor devuelto por dicho mé
+                if (it.next().compareTo(factura) == 0) {
+                    fileWriter.write("Factura encontrada.");
+                    // Cerramos "fileWriter"
+                    fileWriter.close();
+                    logger.info("Factura encontrada");
+                    return factura;
+                }
+            }
+            // TRAZAMOS
+            fileWriter.write("Factura no encontrada.");
+            // Cerramos "fileWriter"
+            fileWriter.close();
+            logger.info("Factura no encontrada");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        // En caso de recorrer el arrayList y no encontrar coincidencia
+        // devolvemos "null"
+        return null;
     }
     // Eliminar Factura
     /**
@@ -196,69 +268,95 @@ public abstract class Persona {
      * @return true si la factura se ha eliminado correctamente, false en caso contrario.
      */
     public boolean eliminarFactura(Factura factura) {
-        // Llamamos al método "buscarFactura" para encontrar la posición del elemento a
-        // eliminar y le asignamos el valor a una variable
-        int posicion = buscarFactura(factura);
-        // Inicializamos un nuevo array de facturas
-        Factura[] nuevoListadoFacturas = new Factura[10];
-        // Evaluamos que la posición devuelta sea mayor o igual a 0, ya que en caso contrario
-        // significa que el objeto factura es nulo, de otro tipo o no se ha encontrado
-        if(posicion>=0) {
-            // Inicializamos un contador para recorrer el array nuevo
-            int contador=0;
-            // Recorremos el array de Facturas y la guardamos mientras no coincida, en el nuevo array
-            // asi obtenemos un nuevo array usamos un bucle for porque debemos recorrerlo entero
-            for(int i=0; i<listadoFacturas.length; i++) {
-                // Si no coincide la variable iteradora con la posición que deseamos eliminar,
-                // la almacenamos e incrementamos el contador de posiciones del nuevo
-                // array, en caso contrario no, así conseguimos que no se quede el hueco
-                // de la posición que hemos eliminado en el nuevo listado
-                if(i!=posicion) {
-                    nuevoListadoFacturas[contador] = listadoFacturas[i];
-                    // Incrementamos el contador
-                    contador++;
-                }
-            }
-            // Reasignamos al listado de facturas el nuevo listado
-            setListadoFacturas(nuevoListadoFacturas);
-            // Devolvemos un true para verificar que se ha hecho correctamente
-            logger.info("Factura eliminada");
-            return true;
+        // Validamos si la factura es nula
+        if(Persona.facturaIsNull(factura)) {
+            // Devolvemos "false" en caso de que sea "nula" para indicar al programamdor que no se ha
+            // añadido la factura al "listadoFactura"
+            return false;
         }
-        // Devolvemos false, en caso de que no se haya eliminado ningun elemento y siga igual
-        logger.info("Factura no eliminada");
-        return false;
+        // Si no es nulo, llamamos al método "remove", que verifica si dicho objeto existe en el arrayLIst,
+        // y en caso afirmativo lo elimina
+        // Como el método nos devuelve un booleano, lo aprovechamos y lo devolvemos
+        return listadoFacturas.remove(factura);
     }
     // Editar factura
     /**
-     * Método para modificar una factura en el listado de facturas de la persona.
-     * @param facturaBuscar factura que se va a buscar y modificar.
-     * @param facturaNueva la factura nueva que va reemplazará a la factura antigua.
-     * @return true si la factura se ha modificado correctamente, false en caso contrario.
+     * Método para modificar una venta en el listado de ventas de la persona.
+     * @param facturaBuscar venta que se va a buscar y modificar.
+     * @param facturaNueva la venta nueva que va reemplazará a la venta antigua.
+     * @return true si la venta se ha modificado correctamente, false en caso contrario.
      */
     public boolean modificarFactura(Factura facturaBuscar, Factura facturaNueva) {
-        // Llamamos al método buscar factura para localizar la factura a modificar
-        // y guardamos la posición en una variable
-        int posicion = buscarFactura(facturaBuscar);
-        // Evaluamos que la posición devuelta sea mayor o igual a 0, ya que en caso contrario
-        // significa que el objeto factura es nulo, de otro tipo o no se ha encontrado
-        if(posicion>=0) {
-            // Se lo asignamos a la factura nueva el identificador de la antigua
-            facturaNueva.setId(listadoFacturas[posicion].getId());
-            // Le asignamos al objeto de factura en esa posición, los nuevos valores, que
-            // son los del objeto "facturaNueva"
-            listadoFacturas[posicion] = facturaNueva;
-            // Devolvemos un true para verificar que se ha hecho correctamente
-            logger.info("Factura editada");
-            return true;
+        // Validamos si la factura es nulo uno de los dos objetos
+        if(Persona.facturaIsNull(facturaBuscar) || Persona.facturaIsNull(facturaNueva)) {
+            // Devolvemos "false" en caso de que una de las dos
+            return false;
         }
-        // Devolvemos false, en caso de que no se haya modficado ningun elemento y siga igual
-        logger.info("Factura no editada");
-        return false;
+
+        // Creamos el objeto FileWriter
+        try {
+            FileWriter fileWriter = new FileWriter(Test.NOMBRE_ARCHIVO);
+            // Llamamos al método "indexOf" para averiguar la posición del elemento que buscamos en el ArrayList
+            int posicion = listadoFacturas.indexOf(facturaBuscar);
+            // Aprovechando que "indexOf", nos devuelve un -1 en caso de no encontrar el objeto en el ArrayList
+            // por lo que evaluamos que la posición es menor a 0
+            if(posicion < 0) {
+                // TRAZAMOS
+                fileWriter.write("Factura no encontrada.");
+                // Cerramos "fileWriter"
+                fileWriter.close();
+                logger.info("Factura no encontrada.");
+                // Si no se encuentra devolvemos "false"
+                return false;
+            }
+            // En primer lugar, le asignamos al nuevo objeto, el id del viejo
+            facturaNueva.setId(listadoFacturas.get(posicion).getId());
+            // Asignamos el nuevo Objeto, en la posición del antiguo
+            listadoFacturas.set(posicion, facturaNueva);
+            fileWriter.write("Factura no modificada");
+            // Cerramos "fileWriter"
+            fileWriter.close();
+            logger.info("Factura no modificada.");
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        // Si se ha modificado el objeto correctamente, devolvemos un true
+        return true;
     }
 
 
     // VENTA
+    // Verificar nulidad
+    /**
+     * Método para validar la nulidad de la Venta
+     * @param venta
+     * @return
+     */
+    public static boolean ventaIsNull(Venta venta) {
+        // Validamos si la venta es "nula", en cuyo caso, trazamos el mensaje, y devolvemos "true"
+        if(venta == null) {
+            try {
+                // Creamos un objeto de "fileWriter" para trazar el mensaje, y le pasamos como segundo parámetro
+                // "true" para que no sobreescriba el archivo, sino que lo añada al final
+                FileWriter fileWriter = new FileWriter(Test.NOMBRE_ARCHIVO, true);
+                // Trazamos con el objeto de "fileWriter" de la clase en el archivo "mensaje_metodos.txt"
+                // TRAZAMOS CON "FILEWRITER"
+                fileWriter.write("Objeto de Venta Nulo");
+                // Cerramos "fileWriter"
+                fileWriter.close();
+                // TRAZAMOS CON "LOGGER"
+                // Trazamos por consola y en el archivo "java.log" con el "logger.info"
+                logger.info("Objeto de Venta Nulo");
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+            // Devolvemos "true" para indicar que la venta es "nula"
+            return true;
+        }
+        // Devolvemos "false" para indicar que el objeto no es "nulo"
+        return false;
+    }
     // Añadir Venta
     /**
      * Método para añadir una venta al listado de ventas de la persona.
@@ -266,19 +364,33 @@ public abstract class Persona {
      * @return true si la factura se ha añadido correctamente, false en caso contrario.
      */
     public boolean addVenta(Venta venta) {
-        // Evaluamos que sea una instancia de "Venta" y que no sea un valor nulo
-        if(venta!=null) {
+        try {
+            // Evaluamos la nulidad
+            // Llamamos al método "facturaIsNull" para comprobar si la venta es nula
+            if(Persona.ventaIsNull(venta)) {
+                // Devolvemos "false" en caso de que sea "nula" para indicar al programamdor que no se ha
+                // añadido la venta al "listadoVentas"
+                return false;
+            }
+            // Creamos un objeto de "fileWriter" para trazar el mensaje, y le pasamos como segundo parámetro
+            // "true" para que no sobreescriba el archivo, sino que lo añada al final
+            FileWriter fileWriter = new FileWriter(Test.NOMBRE_ARCHIVO, true);
             // En caso de no ser nulo, añadimos la venta al arrayList con "add"
             listadoVentas.add(venta);
+            // TRAZAMOS CON "FILEWRITER"
+            fileWriter.write("Venta añadida.");
+            // Cerramos "fileWriter"
+            fileWriter.close();
+            // TRAZAMOS CON "LOGGER"
             // Si se ha agregado devolvemos un true y así salimos del bucle también
             logger.info("Venta añadida");
-            return true;
-        } else {
-            // Si no se ha añadido correctamente devolvemos "false"
-            logger.info("Venta no añadida");
-            return false;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
+        // Devolvemos "true" para indicar que la Venta se ha añadido al listado
+        return true;
     }
+
     // Buscar Venta
     /**
      * Método para buscar una venta en el listado de ventas de la persona.
@@ -287,11 +399,18 @@ public abstract class Persona {
      * -2 si el parámetro no es válido.
      */
     public Venta buscarVenta(Venta venta) {
-        // Evaluamos que sea una instancia de "Factura" y que no sea un valor nulo
-        if(venta!=null) {
-            // En primer lugar ordenamos el arrayList haciendo uso del método "sort", pero de la interfaz
-            // colection en este caso, ya que no es un array normal
-            Collections.sort(listadoVentas);
+        // Validamos si la venta es nula
+        if(Persona.ventaIsNull(venta)) {
+            // Devolvemos "null" en caso de que sea "nula" para indicar al programamdor que no se ha
+            // añadido la venta al "listadoVenta"
+            return null;
+        }
+
+        // Creamos una instancia de FileWriter para trazar el mensaje en el archivo
+        try {
+            // Creamos un objeto de "fileWriter" para trazar el mensaje, y le pasamos como segundo parámetro
+            // "true" para que no sobreescriba el archivo, sino que lo añada al final
+            FileWriter fileWriter = new FileWriter(Test.NOMBRE_ARCHIVO, true);
             // Creamos un iterador para recorrer el arrayList
             // CRITERIO: Se han utilizado iteradores para recorrer los elementos de las listas (10%).
             Iterator<Venta> it = listadoVentas.iterator();
@@ -301,17 +420,27 @@ public abstract class Persona {
             while (it.hasNext()) {
                 // En caso de existir, nos devuelve true, y acontinuación haciendo uso del método "next()"
                 // accedemos a dicho elemento y aprovechando que tenemos implementado en "Venta" la interfaz
-                // comparable, evaluamos si el valor devuelto por dicho mé
+                // comparable, evaluamos si el valor devuelto por dicho método es 0
                 if (it.next().compareTo(venta) == 0) {
+                    fileWriter.write("Venta encontrada.");
+                    // Cerramos "fileWriter"
+                    fileWriter.close();
                     logger.info("Venta encontrada");
                     return venta;
                 }
             }
+            // TRAZAMOS
+            fileWriter.write("Venta no encontrada.");
+            // Cerramos "fileWriter"
+            fileWriter.close();
+            logger.info("Venta no encontrada");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
         // En caso de recorrer el arrayList y no encontrar coincidencia
         // devolvemos "null"
-        // En caso de que el objeto pasado sea nulo, devolvemos "null"
         return null;
+
     }
     // Eliminar Venta
     /**
@@ -320,9 +449,10 @@ public abstract class Persona {
      * @return true si la venta se ha eliminado correctamente, false en caso contrario.
      */
     public boolean eliminarVenta(Venta venta) {
-        // Evaluamos la nulidad del objeto pasado
-        if(venta==null) {
-            // En caso de ser nulo, devolvemos un valor "false"
+        // Validamos si la venta es nula
+        if(Persona.ventaIsNull(venta)) {
+            // Devolvemos "false" en caso de que sea "nula" para indicar al programamdor que no se ha
+            // añadido la venta al "listadoVenta"
             return false;
         }
         // Si no es nulo, llamamos al método "remove", que verifica si dicho objeto existe en el arrayLIst,
@@ -339,26 +469,43 @@ public abstract class Persona {
      * @return true si la venta se ha modificado correctamente, false en caso contrario.
      */
     public boolean modificarVenta(Venta ventaBuscar, Venta ventaNueva) {
-        // Evaluamos que los dos objetos no sean nulos
-        if((ventaBuscar == null) && (ventaNueva == null)) {
+        // Validamos si la factura es nulo uno de los dos objetos
+        if(Persona.ventaIsNull(ventaBuscar) || Persona.ventaIsNull(ventaNueva)) {
+            // Devolvemos "false" en caso de que una de las dos
             return false;
         }
-        // Llamamos al método "indexOf" para averiguar la posición del elemento que buscamos en el ArrayList
-        int posicion = listadoVentas.indexOf(ventaBuscar);
-        // Aprovechando que "indexOf", nos devuelve un -1 en caso de no encontrar el objeto en el ArrayList
-        // y evaluamos que la posición sea menor a 0
-        if(posicion < 0) {
-            // Si no se encuentra devolvemos "false"
-            return false;
+
+        // Creamos el objeto FileWriter
+        try {
+            FileWriter fileWriter = new FileWriter(Test.NOMBRE_ARCHIVO, true);
+            // Llamamos al método "indexOf" para averiguar la posición del elemento que buscamos en el ArrayList
+            int posicion = listadoVentas.indexOf(ventaBuscar);
+            // Aprovechando que "indexOf", nos devuelve un -1 en caso de no encontrar el objeto en el ArrayList
+            // por lo que evaluamos que la posición es menor a 0
+            if(posicion < 0) {
+                // TRAZAMOS
+                fileWriter.write("Venta no encontrada.");
+                // Cerramos "fileWriter"
+                fileWriter.close();
+                logger.info("Venta no encontrada.");
+                // Si no se encuentra devolvemos "false"
+                return false;
+            }
+            // En primer lugar, le asignamos al nuevo objeto, el id del viejo
+            ventaNueva.setId(listadoVentas.get(posicion).getId());
+            // Asignamos el nuevo Objeto, en la posición del antiguo
+            listadoVentas.set(posicion, ventaNueva);
+            fileWriter.write("Venta modificada");
+            // Cerramos "fileWriter"
+            fileWriter.close();
+            logger.info("Venta modificada.");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-        // En primer lugar, le asignamos al nuevo objeto, el id del viejo
-        ventaNueva.setId(listadoVentas.get(posicion).getId());
-        // Asignamos el nuevo Objeto, en la posición del antiguo
-        listadoVentas.set(posicion, ventaNueva);
+
         // Si se ha modificado el objeto correctamente, devolvemos un true
         return true;
     }
-
 
     // GETTERS Y SETTERS
     // Nombre
@@ -401,24 +548,15 @@ public abstract class Persona {
         this.listadoVentas = listadoVentas;
     }
     // Listado Facturas
-    public Factura[] getListadoFacturas() {
+
+    public ArrayList<Factura> getListadoFacturas() {
         return listadoFacturas;
     }
-    /**
-     * Este método setter nos sirve para cambiar el listado de las facturas de la persona,
-     * además se asegura que el listado pasado sea del mismo tamaño que el anterior para
-     * evitar errores.
-     * @param listadoFacturas el nuevo listado de facturas.
-     * @return true si el listado de facturas se ha establecido correctamente, false en caso contrario.
-     */
-    public boolean setListadoFacturas(Factura[] listadoFacturas) {
-        // Nos aseguramos de que ambos arrays tengan el mismo tamaño
-        if(listadoFacturas.length==getListadoFacturas().length) {
-            this.listadoFacturas = listadoFacturas;
-            // Devolvemos true si se a reasignado correctamente
-            return true;
-        } else return false;
+
+    public void setListadoFacturas(ArrayList<Factura> listadoFacturas) {
+        this.listadoFacturas = listadoFacturas;
     }
+
     // Edad
     public int getEdad() {
         return edad;
