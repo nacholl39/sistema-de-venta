@@ -2,9 +2,9 @@
 <!DOCTYPE log SYSTEM "logger.dtd">
 <log>
 <record>
-  <date>2024-03-30T10:30:53.971759900Z</date>
-  <millis>1711794653971</millis>
-  <nanos>759900</nanos>
+  <date>2024-04-10T19:11:43.429098600Z</date>
+  <millis>1712776303429</millis>
+  <nanos>98600</nanos>
   <sequence>0</sequence>
   <logger>A</logger>
   <level>INFO</level>
@@ -14,9 +14,9 @@
   <message>Factura añadida</message>
 </record>
 <record>
-  <date>2024-03-30T10:30:53.988817100Z</date>
-  <millis>1711794653988</millis>
-  <nanos>817100</nanos>
+  <date>2024-04-10T19:11:43.445151800Z</date>
+  <millis>1712776303445</millis>
+  <nanos>151800</nanos>
   <sequence>1</sequence>
   <logger>A</logger>
   <level>INFO</level>
@@ -26,9 +26,9 @@
   <message>Venta añadida</message>
 </record>
 <record>
-  <date>2024-03-30T10:30:53.990823800Z</date>
-  <millis>1711794653990</millis>
-  <nanos>823800</nanos>
+  <date>2024-04-10T19:11:43.447157800Z</date>
+  <millis>1712776303447</millis>
+  <nanos>157800</nanos>
   <sequence>2</sequence>
   <logger>A</logger>
   <level>INFO</level>
@@ -38,9 +38,9 @@
   <message>Factura añadida</message>
 </record>
 <record>
-  <date>2024-03-30T10:30:53.991827700Z</date>
-  <millis>1711794653991</millis>
-  <nanos>827700</nanos>
+  <date>2024-04-10T19:11:43.448162400Z</date>
+  <millis>1712776303448</millis>
+  <nanos>162400</nanos>
   <sequence>3</sequence>
   <logger>A</logger>
   <level>INFO</level>
@@ -50,9 +50,9 @@
   <message>Venta añadida</message>
 </record>
 <record>
-  <date>2024-03-30T10:30:53.993834300Z</date>
-  <millis>1711794653993</millis>
-  <nanos>834300</nanos>
+  <date>2024-04-10T19:11:43.450168400Z</date>
+  <millis>1712776303450</millis>
+  <nanos>168400</nanos>
   <sequence>4</sequence>
   <logger>A</logger>
   <level>INFO</level>
@@ -62,9 +62,9 @@
   <message>Venta encontrada</message>
 </record>
 <record>
-  <date>2024-03-30T10:30:54.014902700Z</date>
-  <millis>1711794654014</millis>
-  <nanos>902700</nanos>
+  <date>2024-04-10T19:11:43.469231400Z</date>
+  <millis>1712776303469</millis>
+  <nanos>231400</nanos>
   <sequence>5</sequence>
   <logger>A</logger>
   <level>INFO</level>
@@ -74,34 +74,34 @@
   <message>Venta encontrada</message>
 </record>
 <record>
-  <date>2024-03-30T10:30:54.015906Z</date>
-  <millis>1711794654015</millis>
-  <nanos>906000</nanos>
-  <sequence>6</sequence>
-  <logger>A</logger>
-  <level>INFO</level>
-  <class>persona.Persona</class>
-  <method>modificarVenta</method>
-  <thread>1</thread>
-  <message>Venta modificada.</message>
-</record>
-<record>
-  <date>2024-03-30T10:30:54.016908900Z</date>
-  <millis>1711794654016</millis>
-  <nanos>908900</nanos>
+  <date>2024-04-10T19:11:50.767441400Z</date>
+  <millis>1712776310767</millis>
+  <nanos>441400</nanos>
   <sequence>7</sequence>
   <logger>A</logger>
   <level>INFO</level>
   <class>persona.Persona</class>
+  <method>modificarVenta</method>
+  <thread>1</thread>
+  <message>Venta modificada.</message>
+</record>
+<record>
+  <date>2024-04-10T19:11:50.769447Z</date>
+  <millis>1712776310769</millis>
+  <nanos>447000</nanos>
+  <sequence>8</sequence>
+  <logger>A</logger>
+  <level>INFO</level>
+  <class>persona.Persona</class>
   <method>buscarVenta</method>
   <thread>1</thread>
   <message>Venta encontrada</message>
 </record>
 <record>
-  <date>2024-03-30T10:30:54.018916200Z</date>
-  <millis>1711794654018</millis>
-  <nanos>916200</nanos>
-  <sequence>8</sequence>
+  <date>2024-04-10T19:11:50.770451Z</date>
+  <millis>1712776310770</millis>
+  <nanos>451000</nanos>
+  <sequence>9</sequence>
   <logger>A</logger>
   <level>INFO</level>
   <class>persona.Persona</class>
@@ -110,10 +110,10 @@
   <message>Venta modificada.</message>
 </record>
 <record>
-  <date>2024-03-30T10:30:54.019919300Z</date>
-  <millis>1711794654019</millis>
-  <nanos>919300</nanos>
-  <sequence>9</sequence>
+  <date>2024-04-10T19:11:50.771453800Z</date>
+  <millis>1712776310771</millis>
+  <nanos>453800</nanos>
+  <sequence>10</sequence>
   <logger>A</logger>
   <level>INFO</level>
   <class>persona.Persona</class>
@@ -122,10 +122,10 @@
   <message>Venta encontrada</message>
 </record>
 <record>
-  <date>2024-03-30T10:30:54.020922700Z</date>
-  <millis>1711794654020</millis>
-  <nanos>922700</nanos>
-  <sequence>10</sequence>
+  <date>2024-04-10T19:11:50.774463700Z</date>
+  <millis>1712776310774</millis>
+  <nanos>463700</nanos>
+  <sequence>11</sequence>
   <logger>A</logger>
   <level>INFO</level>
   <class>persona.Persona</class>
@@ -134,10 +134,10 @@
   <message>Venta no encontrada</message>
 </record>
 <record>
-  <date>2024-03-30T10:30:54.022930Z</date>
-  <millis>1711794654022</millis>
-  <nanos>930000</nanos>
-  <sequence>11</sequence>
+  <date>2024-04-10T19:11:50.775467400Z</date>
+  <millis>1712776310775</millis>
+  <nanos>467400</nanos>
+  <sequence>12</sequence>
   <logger>A</logger>
   <level>INFO</level>
   <class>persona.Persona</class>

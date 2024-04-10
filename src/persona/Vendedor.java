@@ -10,7 +10,7 @@ import venta.Venta;
  * @author Mlm96
  * @version 1.0
  */
-public final class Vendedor extends Persona{
+public final class Vendedor extends Persona {
     // Declaramos los atributos
     private static int contador;
     private int numeroVendedor;

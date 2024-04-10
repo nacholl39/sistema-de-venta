@@ -13,8 +13,12 @@ import venta.Venta;
 import xml.Xml;
 
 import javax.swing.*;
+import java.io.DataInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.time.DateTimeException;
 
 import java.time.LocalDate;
@@ -276,7 +280,34 @@ public class Test {
          ha hacer y seguiremos usando al listado de ventas del cliente original, aunque dicha venta aparezca con los
          datos del nuevo Cliente.
          */
-        Cliente nuevoCliente = new Cliente("00000000-f", "felipe", LocalDate.of(1990, 12, 12));
+        // CRITERIO ?: FLUJOS DE RED
+        // Creamos un flujo de red para recibir una instancia de Cliente, desde la clase "RedesCliente"
+        Cliente nuevoCliente = null;
+        // Abrir servidor en el puerto 3000
+        ServerSocket serverSocket = null;
+        try {
+            serverSocket = new ServerSocket(3000);
+            System.out.println("Ahora tenemos que ejecutar la clase RedesCliente ");
+            // Quedarse en escucha hasta que un cliente establezca la comunicación
+            Socket socket = serverSocket.accept();
+            // Recoger flujo de datos de entrada del Socket
+            ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
+            // Recogemos el objeto de Cliente, lo envolvemos en un try/catch
+            try {
+                // Hacemos casting
+                nuevoCliente = (Cliente) objectInputStream.readObject();
+            } catch (ClassNotFoundException e) {
+                System.out.println(e.getMessage());
+            }
+            // Cerramos las instancias de objectInputStream para cerrar el flujo de entrada
+            objectInputStream.close();
+            serverSocket.close();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+
+        // Cliente nuevoCliente = new Cliente("00000000-f", "felipe", LocalDate.of(1990, 12, 12));
         Venta nuevaVenta = new Venta(nuevoCliente, vendedor); // Dejamos el mismo vendedor
         // CLIENTE
         // Llamamos al método y le pasamos la "venta" anterior, ya que tiene que buscarla, y la nueva, para que la sustituye
@@ -284,7 +315,7 @@ public class Test {
         // Buscamos el nuevo objeto en el ArrayList para ver si ha sustituido al anterior
         // Mostramos la nueva venta dentro del listado para verificar que se haya añadido
         System.out.println();
-        System.out.println("Ventas con nuevo Cliente (modificada):");
+        System.out.println("Ventas con nuevo Cliente (modificada, verificar los datos del cliente de la venta):");
         System.out.println("Se ha encontrado la venta: " + cliente.buscarVenta(nuevaVenta)
                 + " en el arrayList de Cliente.");
 
@@ -345,7 +376,17 @@ public class Test {
         // pasamos el nombre del archivo en el que hemos ido trazando los mensajes
         // "mensajes_metodos.txt" y el nombre del archivo que será la copia "archivoCopia.txt"
         Copy.copiar(NOMBRE_ARCHIVO, NOMBRE_ARCHIVO_COPIA);
+
+
+
+
+
+
     }
+
+
+
+
 
     /**
      * Este método tendrá un objeto de "FileWrtiter" con el objetivo de sobreescribir el archivo

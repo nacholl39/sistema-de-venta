@@ -1,5 +1,6 @@
 package persona;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Arrays;
 
@@ -14,7 +15,10 @@ import venta.Venta;
  * @author Mlm96
  * @version 1.0
  */
-public final class Cliente extends Persona {
+// CRITERIO ?: SERIALIZABLE, lo implemento en la clase "Cliente" y "Persona" porque me exije que
+// lo implemente en toda la jerarquía para poder enviar instancias de la clase "Cliente" por el
+// flujo de red. Con esto tengo implementada la interfaz serializable
+public final class Cliente extends Persona implements Serializable {
     // Declaramos los atributos
     private static int contador;
     private int codigoCliente;

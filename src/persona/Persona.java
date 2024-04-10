@@ -2,6 +2,7 @@ package persona;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Serializable;
 import java.time.LocalDate;
 
 import logger.MyLogger;
@@ -30,7 +31,7 @@ import venta.Venta;
  * @author Mlm96
  * @version 1.2
  */
-public abstract class Persona {
+public abstract class Persona implements Serializable {
     // Declaramos los atributos
     protected String nif, nombre, direccion, correo;
     protected int telefono, edad;

@@ -42,3 +42,11 @@ Estos criterios los he desarrollado en las clases "Persona", "Copy", "VentanaFec
             mensajes por consola con "println".
       - f, g, h: Utilizaremos las interfaces gráficas y los eventos, para interaccionar con el usuario
                 y pedirle los valores de los atributos del Vendedor.
+
+- Criterios "RedesCliente" y "Test": ?? (serialización y flujos de red).
+      - serialización: Implemento esta interfaz en "Cliente" y el "Persona" para que me permita enviar
+            a través del flujo de red intancias de "Cliente".
+      - flujos de red: En la clase "RedesCliente" creo una instancia de "ObjectOutputStream" que me va
+            a permitir enviar al "main" de la clase "Test" una instancia de "Cliente".
+            Además, como he comentado, en la clase "Test" tengo creada una instancia de "objectInputStream"
+            que me va a permitir recibir la instancia de "Cliente" enviada desde la clase "RedesCliente".
